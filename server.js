@@ -56,6 +56,13 @@ async function initDb() {
     data TEXT NOT NULL,
     updated_at INTEGER NOT NULL
   )`);
+  // ตารางอันดับ: สถิติที่ดีที่สุดของแต่ละบัญชี (ตัวละครตายแล้วรีเซ็ต แต่สถิติดีสุดยังอยู่)
+  await db.execute(`CREATE TABLE IF NOT EXISTS stats (
+    user_id INTEGER PRIMARY KEY,
+    best_kills INTEGER NOT NULL DEFAULT 0,
+    best_level INTEGER NOT NULL DEFAULT 0,
+    updated_at INTEGER NOT NULL
+  )`);
   await bootstrapAdmin();
 }
 
@@ -216,6 +223,82 @@ function cleanName(n) {
   return String(n || "Player").replace(/[^\p{L}\p{N} _-]/gu, "").slice(0, 16) || "Player";
 }
 
+// ---------------------------------------------------------------- จัดการบัญชี + ตารางอันดับ
+async function checkPass(userId, pass) {
+  const r = await db.execute({ sql: "SELECT pass_hash FROM users WHERE id = ?", args: [userId] });
+  return !!r.rows[0] && (await bcrypt.compare(pre(String(pass ?? "")), String(r.rows[0].pass_hash)));
+}
+
+// เปลี่ยนรหัสผ่าน: ต้องรู้รหัสเดิม → ล้างการล็อกอินทุกเครื่อง แล้วออก token ใหม่ให้เครื่องนี้
+async function doChangePass(ws, m) {
+  if (limited("pw:" + ws.ip, 8)) return authErr(ws, "rate_limited");
+  const user = await userFromToken(m.token);
+  if (!user) return authErr(ws, "auth_required");
+  const np = String(m.new ?? "");
+  if (np.length < PASS_MIN || np.length > PASS_MAX) return authErr(ws, "bad_pass");
+  if (user.admin) return authErr(ws, "admin_locked");   // รหัสแอดมินเปลี่ยนที่ Environment (ADMIN_PASSWORD) เท่านั้น
+  if (!(await checkPass(user.id, m.old))) { bump("pw:" + ws.ip); return authErr(ws, "bad_old_pass"); }
+  const hash = await bcrypt.hash(pre(np), BCRYPT_COST);
+  await db.execute({ sql: "UPDATE users SET pass_hash = ? WHERE id = ?", args: [hash, user.id] });
+  await db.execute({ sql: "DELETE FROM sessions WHERE user_id = ?", args: [user.id] });
+  send(ws, { t: "pass_ok", token: await newSession(user.id) });
+}
+
+// ลบบัญชี: ต้องยืนยันด้วยรหัสผ่าน — ลบตัวละคร/สถิติ/การล็อกอินทั้งหมด
+async function doDeleteAccount(ws, m) {
+  if (limited("pw:" + ws.ip, 8)) return authErr(ws, "rate_limited");
+  const user = await userFromToken(m.token);
+  if (!user) return authErr(ws, "auth_required");
+  if (user.admin) return authErr(ws, "admin_locked");
+  if (!(await checkPass(user.id, m.pass))) { bump("pw:" + ws.ip); return authErr(ws, "bad_old_pass"); }
+  for (const t of ["sessions", "characters", "stats"]) await db.execute({ sql: `DELETE FROM ${t} WHERE user_id = ?`, args: [user.id] });
+  await db.execute({ sql: "DELETE FROM users WHERE id = ?", args: [user.id] });
+  const old = online.get(user.id);
+  if (old) { send(old, { t: "kicked" }); leave(old); try { old.close(); } catch {} }
+  console.log("ลบบัญชี:", user.name);
+  send(ws, { t: "deleted" });
+}
+
+// แอดมินตั้งรหัสผ่านใหม่ให้ผู้เล่นที่ลืมรหัส (ต้องเป็นแอดมิน + รหัสปลดล็อกแผงถูก ถ้าตั้งไว้)
+async function doAdminReset(ws, m) {
+  if (limited("adm:" + ws.ip, 5)) return send(ws, { t: "admin_error", msg: "rate_limited" });
+  const user = await userFromToken(m.token);
+  if (!user || !user.admin) { bump("adm:" + ws.ip); return send(ws, { t: "admin_error", msg: "not_admin" }); }
+  const want = process.env.ADMIN_PASSCODE || "";
+  if (want) {
+    const a = crypto.createHash("sha256").update(String(m.code ?? "")).digest();
+    const b = crypto.createHash("sha256").update(want).digest();
+    if (!crypto.timingSafeEqual(a, b)) { bump("adm:" + ws.ip); return send(ws, { t: "admin_error", msg: "bad_code" }); }
+  }
+  const np = String(m.new ?? "");
+  if (np.length < PASS_MIN || np.length > PASS_MAX) return send(ws, { t: "admin_error", msg: "bad_pass" });
+  const r = await db.execute({ sql: "SELECT id, is_admin FROM users WHERE name_lower = ?", args: [String(m.user ?? "").trim().toLowerCase()] });
+  const row = r.rows[0];
+  if (!row) return send(ws, { t: "admin_error", msg: "no_user" });
+  if (Number(row.is_admin) === 1) return send(ws, { t: "admin_error", msg: "admin_locked" });
+  const hash = await bcrypt.hash(pre(np), BCRYPT_COST);
+  await db.execute({ sql: "UPDATE users SET pass_hash = ? WHERE id = ?", args: [hash, row.id] });
+  await db.execute({ sql: "DELETE FROM sessions WHERE user_id = ?", args: [row.id] });
+  console.log("แอดมิน", user.name, "รีเซ็ตรหัสให้", String(m.user));
+  send(ws, { t: "admin_reset_ok" });
+}
+
+// ตารางอันดับ 10 อันดับแรก (ไม่ต้องล็อกอิน) — แคชไว้ 30 วินาที
+let lbCache = null, lbAt = 0;
+async function doLeaderboard(ws) {
+  if (limited("lb:" + ws.ip, 30)) return send(ws, { t: "error", msg: "rate_limited" });
+  bump("lb:" + ws.ip);
+  if (!lbCache || Date.now() - lbAt > 30e3) {
+    const q = (col) => db.execute(`SELECT u.name AS name, s.${col} AS v FROM stats s JOIN users u ON u.id = s.user_id
+      WHERE s.${col} > 0 ORDER BY s.${col} DESC, s.updated_at ASC LIMIT 10`);
+    const [k, l] = await Promise.all([q("best_kills"), q("best_level")]);
+    const rows = (r) => r.rows.map((x) => ({ name: String(x.name), v: Number(x.v) }));
+    lbCache = { t: "leaderboard", kills: rows(k), level: rows(l) };
+    lbAt = Date.now();
+  }
+  send(ws, lbCache);
+}
+
 // ปลดล็อกแผงแอดมิน: ต้องเป็นบัญชีแอดมิน (จาก token) + รหัสถูก (ถ้าตั้ง ADMIN_PASSCODE ไว้)
 async function doAdminUnlock(ws, m) {
   if (limited("adm:" + ws.ip, 5)) return send(ws, { t: "admin_error", msg: "rate_limited" });
@@ -243,6 +326,84 @@ async function doGetChar(ws, m) {
 }
 
 // บันทึกตัวละครระหว่างเล่น (ส่งมาทางการเชื่อมต่อห้อง) — รวมคำสั่งที่ถี่เกินให้เหลือฉบับล่าสุด เขียนไม่เกิน ~1 ครั้ง/วินาที
+// ---------------------------------------------------------------- ตรวจข้อมูลตัวละครก่อนเซฟ (กันแก้เกมแล้วส่งของ/เลเวลปลอม)
+// ค่าเพดานตรงกับ config.gd ของเกม — แก้เกมแล้วอย่าลืมแก้ตรงนี้ด้วย
+const LIMITS = {
+  MAX_SLOTS: 80, QUICK_N: 6, ACC_SLOTS: 3, WEAPON_SLOTS: 2, STACK_MAX: 100,
+  MAX_LEVEL: 36, SKILL_MAX: 5, MAX_SKILL_POINTS: 200,
+  // ต่อการเซฟ 1 ครั้ง (เกมเซฟทุก ~5 วินาที) — เกินนี้ถือว่าผิดปกติ ไม่บันทึก (แอดมินได้รับยกเว้น)
+  MAX_LEVEL_GAIN: 3, MAX_KILL_GAIN: 150, MAX_ITEM_GAIN: 400,
+};
+const ITEM_ID_RE = /^[a-z0-9_]{1,32}$/;
+const isInt = (v, lo, hi) => typeof v === "number" && Number.isFinite(v) && v >= lo && v <= hi;
+
+function checkSlot(e, where) {
+  if (e === null || e === undefined) return "";
+  if (typeof e !== "object" || Array.isArray(e)) return where + ": รูปแบบผิด";
+  if (typeof e.id !== "string" || !ITEM_ID_RE.test(e.id)) return where + ": id ผิด";
+  if (!isInt(e.count, 1, LIMITS.STACK_MAX)) return where + ": จำนวนเกิน";
+  if (e.dur !== undefined && !isInt(e.dur, -1, 100000)) return where + ": ความทนผิด";
+  if (e.mag !== undefined && !isInt(e.mag, 0, 1000)) return where + ": แม็กผิด";
+  if (e.tier !== undefined && !isInt(e.tier, 1, 20)) return where + ": tier ผิด";
+  if (e.mods !== undefined) {
+    if (typeof e.mods !== "object" || Array.isArray(e.mods) || Object.keys(e.mods).length > 8) return where + ": ม็อดผิด";
+    for (const v of Object.values(e.mods)) if (typeof v !== "string" || !ITEM_ID_RE.test(v)) return where + ": ม็อดผิด";
+  }
+  return "";
+}
+
+function allSlots(inv) {
+  const out = [];
+  if (!inv || typeof inv !== "object") return out;
+  for (const k of ["slots", "weapons", "quick"]) if (Array.isArray(inv[k])) out.push(...inv[k]);
+  const w = inv.worn;
+  if (w && typeof w === "object") { out.push(w.bag, w.armor); if (Array.isArray(w.acc)) out.push(...w.acc); }
+  return out.filter((e) => e && typeof e === "object");
+}
+const itemTotal = (d) => allSlots(d && d.inv).reduce((n, e) => n + (Number(e.count) || 0), 0);
+
+/** คืน "" = ผ่าน / ไม่งั้นเหตุผลที่ไม่รับ */
+function validateChar(d, prev, admin) {
+  if (!d || typeof d !== "object" || Array.isArray(d)) return "ไม่ใช่ object";
+  if (d.level !== undefined && !isInt(d.level, 1, LIMITS.MAX_LEVEL)) return "เลเวลเกินเพดาน";
+  if (d.xp !== undefined && !isInt(d.xp, 0, 1e9)) return "xp ผิด";
+  if (d.sp !== undefined && !isInt(d.sp, 0, LIMITS.MAX_SKILL_POINTS)) return "แต้มสกิลผิด";
+  if (d.kills !== undefined && !isInt(d.kills, 0, 1e8)) return "จำนวนฆ่าผิด";
+  for (const k of ["health", "hunger", "thirst", "stamina", "energy", "warmth", "battery"]) {
+    if (d[k] !== undefined && !isInt(d[k], -1, 10000)) return k + " ผิด";
+  }
+  if (d.skills !== undefined) {
+    if (typeof d.skills !== "object" || Array.isArray(d.skills)) return "สกิลผิด";
+    for (const v of Object.values(d.skills)) if (!isInt(v, 0, LIMITS.SKILL_MAX)) return "เลเวลสกิลเกิน";
+  }
+  const inv = d.inv;
+  if (inv !== undefined) {
+    if (typeof inv !== "object" || Array.isArray(inv)) return "กระเป๋าผิด";
+    if (inv.slots !== undefined && (!Array.isArray(inv.slots) || inv.slots.length > LIMITS.MAX_SLOTS)) return "ช่องกระเป๋าเกิน";
+    if (inv.quick !== undefined && (!Array.isArray(inv.quick) || inv.quick.length > LIMITS.QUICK_N)) return "ช่องด่วนเกิน";
+    if (inv.weapons !== undefined && (!Array.isArray(inv.weapons) || inv.weapons.length > LIMITS.WEAPON_SLOTS)) return "ช่องอาวุธเกิน";
+    if (inv.worn && Array.isArray(inv.worn.acc) && inv.worn.acc.length > LIMITS.ACC_SLOTS) return "ช่องเสริมเกิน";
+    for (const e of allSlots(inv)) { const r = checkSlot(e, "ไอเทม"); if (r) return r; }
+  }
+  // ตายแล้วเริ่มตัวใหม่ (เซฟก่อนหน้ามีแต่ wseed): ตัวใหม่ต้องเริ่มจากของน้อย ๆ
+  // (prev === null = ไม่เคยมีเซฟบนเซิร์ฟเวอร์เลย เช่นย้ายตัวละครเก่าจากเครื่องขึ้นมาครั้งแรก — ยอมให้ผ่าน)
+  if (!admin && prev && typeof prev === "object" && !prev.inv && d.inv) {
+    if (itemTotal(d) > LIMITS.MAX_ITEM_GAIN) return "ตัวละครใหม่มีของเยอะผิดปกติ";
+    if ((Number(d.kills) || 0) > LIMITS.MAX_KILL_GAIN) return "ตัวละครใหม่ยอดฆ่าสูงผิดปกติ";
+  }
+  // เทียบกับเซฟก่อนหน้า: เพิ่มเร็วผิดปกติ = ไม่รับ
+  if (!admin && prev && typeof prev === "object" && prev.inv && d.inv) {
+    if ((Number(d.level) || 1) - (Number(prev.level) || 1) > LIMITS.MAX_LEVEL_GAIN) return "เลเวลขึ้นเร็วผิดปกติ";
+    if ((Number(d.kills) || 0) - (Number(prev.kills) || 0) > LIMITS.MAX_KILL_GAIN) return "ยอดฆ่าเพิ่มเร็วผิดปกติ";
+    if (itemTotal(d) - itemTotal(prev) > LIMITS.MAX_ITEM_GAIN) return "ของเพิ่มเร็วผิดปกติ";
+  }
+  return "";
+}
+
+const UPSERT_STATS = `INSERT INTO stats (user_id, best_kills, best_level, updated_at) VALUES (?, ?, ?, ?)
+  ON CONFLICT(user_id) DO UPDATE SET best_kills = MAX(best_kills, excluded.best_kills),
+    best_level = MAX(best_level, excluded.best_level), updated_at = excluded.updated_at`;
+
 const UPSERT_CHAR = `INSERT INTO characters (user_id, data, updated_at) VALUES (?, ?, ?)
   ON CONFLICT(user_id) DO UPDATE SET data = excluded.data, updated_at = excluded.updated_at`;
 function queueCharSave(ws, json) {
@@ -256,6 +417,11 @@ function queueCharSave(ws, json) {
         ws.pendingChar = null;
         await dbReady;
         await db.execute({ sql: UPSERT_CHAR, args: [ws.uid, j, nowSec()] });
+        try {
+          const d = JSON.parse(j);
+          const kills = Math.floor(Number(d.kills) || 0), level = Math.floor(Number(d.level) || 0);
+          if (kills > 0 || level > 0) await db.execute({ sql: UPSERT_STATS, args: [ws.uid, kills, level, nowSec()] });
+        } catch (e) { console.error("stats failed:", e); }
         await new Promise((r) => setTimeout(r, 1000));
       }
     } catch (e) {
@@ -281,6 +447,14 @@ function claimOnline(ws, userId) {
   online.set(userId, ws);
 }
 
+// เซฟล่าสุดบนเซิร์ฟเวอร์ (ใช้เทียบตอนตรวจ save_char)
+function loadPrevChar(ws) {
+  ws.prevChar = undefined;   // undefined = กำลังโหลด (ระหว่างนี้ตรวจแค่เพดาน ไม่เทียบการเพิ่ม)
+  db.execute({ sql: "SELECT data FROM characters WHERE user_id = ?", args: [ws.uid] })
+    .then((r) => { try { ws.prevChar = r.rows[0] ? JSON.parse(String(r.rows[0].data)) : null; } catch { ws.prevChar = null; } })
+    .catch(() => { ws.prevChar = null; });
+}
+
 // ชื่อในห้อง = ชื่อบัญชีเสมอ (ไม่เชื่อชื่อที่ไคลเอนต์ส่งมา กันสวมรอย)
 function createRoom(ws, m, user) {
   const code = newCode();
@@ -289,6 +463,8 @@ function createRoom(ws, m, user) {
   ws.pid = 1;
   ws.name = user.name;
   ws.uid = user.id;
+  ws.admin = user.admin;
+  loadPrevChar(ws);
   claimOnline(ws, user.id);
   ws.room = room;
   room.peers.set(1, ws);
@@ -304,6 +480,8 @@ function joinRoom(ws, m, user) {
   ws.pid = room.nextId++;
   ws.name = user.name;
   ws.uid = user.id;
+  ws.admin = user.admin;
+  loadPrevChar(ws);
   claimOnline(ws, user.id);
   ws.room = room;
   const others = [...room.peers.entries()].map(([id, p]) => ({ id, name: p.name }));
@@ -361,12 +539,19 @@ wss.on("connection", (ws, req) => {
         break;
       }
       case "admin_unlock":
+      case "admin_reset":
+      case "change_pass":
+      case "delete_account":
+      case "leaderboard":
       case "get_char": {
         if (ws.room || ws.busy) return;
         ws.busy = true;
-        const job = m.t === "admin_unlock" ? doAdminUnlock(ws, m) : doGetChar(ws, m);
-        job.catch((e) => { console.error(m.t + " error:", e); send(ws, { t: m.t === "admin_unlock" ? "admin_error" : "error", msg: "server_error" }); })
-           .finally(() => { ws.busy = false; });
+        const fn = { admin_unlock: doAdminUnlock, admin_reset: doAdminReset, change_pass: doChangePass,
+          delete_account: doDeleteAccount, leaderboard: doLeaderboard, get_char: doGetChar }[m.t];
+        const errT = m.t.startsWith("admin_") ? "admin_error" : (m.t === "change_pass" || m.t === "delete_account" ? "auth_error" : "error");
+        fn(ws, m)
+          .catch((e) => { console.error(m.t + " error:", e); send(ws, { t: errT, msg: "server_error" }); })
+          .finally(() => { ws.busy = false; });
         break;
       }
       case "save_char": {
@@ -374,6 +559,12 @@ wss.on("connection", (ws, req) => {
         if (!m.data || typeof m.data !== "object" || Array.isArray(m.data)) return;
         const json = JSON.stringify(m.data);
         if (json.length > MAX_CHAR_BYTES) return;
+        const bad = validateChar(m.data, ws.prevChar, ws.admin);
+        if (bad) {
+          if (!ws.warned) { ws.warned = true; console.warn(`[save_char] ไม่รับเซฟของ ${ws.name}: ${bad}`); send(ws, { t: "save_rejected", msg: bad }); }
+          return;
+        }
+        ws.prevChar = m.data;
         queueCharSave(ws, json);
         break;
       }
