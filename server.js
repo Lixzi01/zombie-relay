@@ -198,6 +198,47 @@ async function doLogin(ws, m) {
   });
 }
 
+// ตารางอันดับของ Silent Town แยกจากเซฟและอันดับของ ZOMBAIJAK
+let stTable = null;
+function stReady() {
+  if (!stTable) stTable = dbReady.then(() => db.execute(`CREATE TABLE IF NOT EXISTS st_stats (
+    user_id INTEGER PRIMARY KEY, best_kills INTEGER NOT NULL DEFAULT 0, best_days INTEGER NOT NULL DEFAULT 0,
+    best_wave INTEGER NOT NULL DEFAULT 0, updated_at INTEGER NOT NULL)`));
+  return stTable;
+}
+let stCache = null, stAt = 0;
+const stInt = (v) => Math.min(1000000, Math.max(0, Math.floor(Number(v) || 0)));
+
+async function doStScore(ws, m) {
+  if (limited("st:" + ws.ip, 60)) return;
+  bump("st:" + ws.ip);
+  const user = await userFromToken(m.token);
+  if (!user) return;
+  await stReady();
+  await db.execute({
+    sql: `INSERT INTO st_stats (user_id, best_kills, best_days, best_wave, updated_at) VALUES (?, ?, ?, ?, ?)
+      ON CONFLICT(user_id) DO UPDATE SET best_kills = MAX(best_kills, MIN(excluded.best_kills, best_kills + 3000)),
+      best_days = MAX(best_days, MIN(excluded.best_days, best_days + 60)), best_wave = MAX(best_wave, MIN(excluded.best_wave, best_wave + 40)), updated_at = excluded.updated_at`,
+    args: [user.id, Math.min(stInt(m.kills), 3000), Math.min(stInt(m.days), 60), Math.min(stInt(m.wave), 40), nowSec()],
+  });
+  stCache = null;
+}
+
+async function doStBoard(ws) {
+  if (limited("st:" + ws.ip, 60)) return send(ws, { t: "error", msg: "rate_limited" });
+  bump("st:" + ws.ip);
+  await stReady();
+  if (!stCache || Date.now() - stAt > 30e3) {
+    const q = (col) => db.execute(`SELECT u.name AS name, s.${col} AS v FROM st_stats s JOIN users u ON u.id = s.user_id
+      WHERE s.${col} > 0 ORDER BY s.${col} DESC, s.updated_at ASC LIMIT 10`);
+    const [k, d, w] = await Promise.all([q("best_kills"), q("best_days"), q("best_wave")]);
+    const rows = (r) => r.rows.map((x) => ({ name: String(x.name), v: Number(x.v) }));
+    stCache = { t: "st_leaderboard", kills: rows(k), days: rows(d), wave: rows(w) };
+    stAt = Date.now();
+  }
+  send(ws, stCache);
+}
+
 const rooms = new Map(); // code -> { code, pvp, peers: Map(id -> ws), nextId }
 
 const server = http.createServer((req, res) => {
@@ -594,6 +635,15 @@ wss.on("connection", (ws, req) => {
           const p = room.peers.get(m.to);
           if (p && p.readyState === 1) p.send(out);
         }
+        break;
+      }
+      case "st_score":
+      case "st_leaderboard": {
+        if (ws.busy) return;
+        ws.busy = true;
+        (m.t === "st_score" ? doStScore(ws, m) : doStBoard(ws))
+          .catch((e) => console.error(m.t + " error:", e))
+          .finally(() => { ws.busy = false; });
         break;
       }
       case "ping":
