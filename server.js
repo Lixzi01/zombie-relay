@@ -217,9 +217,9 @@ async function doStScore(ws, m) {
   await stReady();
   await db.execute({
     sql: `INSERT INTO st_stats (user_id, best_kills, best_days, best_wave, updated_at) VALUES (?, ?, ?, ?, ?)
-      ON CONFLICT(user_id) DO UPDATE SET best_kills = MAX(best_kills, excluded.best_kills),
-      best_days = MAX(best_days, excluded.best_days), best_wave = MAX(best_wave, excluded.best_wave), updated_at = excluded.updated_at`,
-    args: [user.id, stInt(m.kills), stInt(m.days), stInt(m.wave), nowSec()],
+      ON CONFLICT(user_id) DO UPDATE SET best_kills = MAX(best_kills, MIN(excluded.best_kills, best_kills + 3000)),
+      best_days = MAX(best_days, MIN(excluded.best_days, best_days + 60)), best_wave = MAX(best_wave, MIN(excluded.best_wave, best_wave + 40)), updated_at = excluded.updated_at`,
+    args: [user.id, Math.min(stInt(m.kills), 3000), Math.min(stInt(m.days), 60), Math.min(stInt(m.wave), 40), nowSec()],
   });
   stCache = null;
 }
