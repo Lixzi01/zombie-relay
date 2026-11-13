@@ -239,6 +239,46 @@ async function doStBoard(ws) {
   send(ws, stCache);
 }
 
+// รายงานผู้เล่นจาก Silent Town (แอดมินดึงดูดได้)
+let repTable = null;
+function repReady() {
+  if (!repTable) repTable = dbReady.then(() => db.execute(`CREATE TABLE IF NOT EXISTS st_reports (
+    id INTEGER PRIMARY KEY AUTOINCREMENT, reporter_id INTEGER NOT NULL, target TEXT NOT NULL, reason TEXT NOT NULL,
+    note TEXT NOT NULL DEFAULT '', room TEXT NOT NULL DEFAULT '', chat TEXT NOT NULL DEFAULT '', created_at INTEGER NOT NULL)`));
+  return repTable;
+}
+const REP_REASONS = new Set(["chat", "cheat", "grief", "name", "other"]);
+const clip = (v, n) => String(v ?? "").replace(/[\u0000-\u001f]/g, " ").slice(0, n);
+
+async function doStReport(ws, m) {
+  if (limited("rep:" + ws.ip, 5)) return send(ws, { t: "st_report_res", ok: false, msg: "rate_limited" });
+  bump("rep:" + ws.ip);
+  const user = await userFromToken(m.token);
+  if (!user) return send(ws, { t: "st_report_res", ok: false, msg: "auth_required" });
+  const target = clip(m.target, 32).trim();
+  const reason = REP_REASONS.has(m.reason) ? m.reason : "other";
+  if (!target) return send(ws, { t: "st_report_res", ok: false, msg: "bad_target" });
+  const chat = Array.isArray(m.chat) ? m.chat.slice(-12).map((x) => clip(x, 160)).join("\n") : "";
+  await repReady();
+  await db.execute({
+    sql: "INSERT INTO st_reports (reporter_id, target, reason, note, room, chat, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)",
+    args: [user.id, target, reason, clip(m.note, 200), clip(m.room, 12), chat, nowSec()],
+  });
+  console.log(`[report] ${user.name} -> ${target} (${reason})`);
+  send(ws, { t: "st_report_res", ok: true });
+}
+
+async function doStReports(ws, m) {
+  const user = await userFromToken(m.token);
+  if (!user || !user.admin) return send(ws, { t: "st_reports", ok: false, list: [] });
+  await repReady();
+  const r = await db.execute(`SELECT r.id AS id, u.name AS by_name, r.target AS target, r.reason AS reason, r.note AS note,
+    r.room AS room, r.chat AS chat, r.created_at AS at FROM st_reports r JOIN users u ON u.id = r.reporter_id
+    ORDER BY r.id DESC LIMIT 30`);
+  send(ws, { t: "st_reports", ok: true, list: r.rows.map((x) => ({ id: Number(x.id), by: String(x.by_name), target: String(x.target),
+    reason: String(x.reason), note: String(x.note), room: String(x.room), chat: String(x.chat), at: Number(x.at) })) });
+}
+
 const rooms = new Map(); // code -> { code, pvp, peers: Map(id -> ws), nextId }
 
 const server = http.createServer((req, res) => {
@@ -643,6 +683,15 @@ wss.on("connection", (ws, req) => {
         ws.busy = true;
         (m.t === "st_score" ? doStScore(ws, m) : doStBoard(ws))
           .catch((e) => console.error(m.t + " error:", e))
+          .finally(() => { ws.busy = false; });
+        break;
+      }
+      case "st_report":
+      case "st_reports": {
+        if (ws.busy) return;
+        ws.busy = true;
+        (m.t === "st_report" ? doStReport(ws, m) : doStReports(ws, m))
+          .catch((e) => { console.error(m.t + " error:", e); send(ws, { t: m.t === "st_report" ? "st_report_res" : "st_reports", ok: false, msg: "server_error" }); })
           .finally(() => { ws.busy = false; });
         break;
       }
