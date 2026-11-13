@@ -688,7 +688,7 @@ wss.on("connection", (ws, req) => {
       }
       case "st_report":
       case "st_reports": {
-        if (ws.busy) return;
+        if (ws.busy) return send(ws, m.t === "st_report" ? { t: "st_report_res", ok: false, msg: "busy" } : { t: "st_reports", ok: false, list: [] });
         ws.busy = true;
         (m.t === "st_report" ? doStReport(ws, m) : doStReports(ws, m))
           .catch((e) => { console.error(m.t + " error:", e); send(ws, { t: m.t === "st_report" ? "st_report_res" : "st_reports", ok: false, msg: "server_error" }); })
