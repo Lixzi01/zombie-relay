@@ -215,6 +215,12 @@ async function doStScore(ws, m) {
   const user = await userFromToken(m.token);
   if (!user) return;
   if (await acFlagged(user.id)) return; // ติดธงกันโกง ไม่รับคะแนน
+  // คะแนนที่เป็นไปไม่ได้ (ตัวเกมถูกแก้): ฆ่าเกินวันละ 400 ตัว หรือรอบเกินวันละ 4 รอบ
+  const days = Math.max(1, stInt(m.days));
+  if (stInt(m.kills) > days * 400 + 300 || stInt(m.wave) > days * 4 + 5) {
+    acFlag({ uid: user.id, name: user.name, room: ws.room }, `คะแนนเป็นไปไม่ได้ (ฆ่า ${stInt(m.kills)} ใน ${days} วัน, รอบ ${stInt(m.wave)})`, null);
+    return;
+  }
   await stReady();
   await db.execute({
     sql: `INSERT INTO st_stats (user_id, best_kills, best_days, best_wave, updated_at) VALUES (?, ?, ?, ?, ?)
