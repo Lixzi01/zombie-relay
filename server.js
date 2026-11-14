@@ -214,6 +214,7 @@ async function doStScore(ws, m) {
   bump("st:" + ws.ip);
   const user = await userFromToken(m.token);
   if (!user) return;
+  if (await acFlagged(user.id)) return; // ติดธงกันโกง ไม่รับคะแนน
   await stReady();
   await db.execute({
     sql: `INSERT INTO st_stats (user_id, best_kills, best_days, best_wave, updated_at) VALUES (?, ?, ?, ?, ?)
@@ -266,6 +267,34 @@ async function doStReport(ws, m) {
   });
   console.log(`[report] ${user.name} -> ${target} (${reason})`);
   send(ws, { t: "st_report_res", ok: true });
+}
+
+// ระบบกันโกง: บัญชีที่ถูกจับได้ ไม่รับคะแนนอันดับ 3 วัน + ลงรายงานให้แอดมินเห็น
+const AC_DAYS = 3;
+let acTable = null;
+function acReady() {
+  if (!acTable) acTable = dbReady.then(() => db.execute(`CREATE TABLE IF NOT EXISTS st_ac (
+    id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL, reason TEXT NOT NULL, created_at INTEGER NOT NULL)`));
+  return acTable;
+}
+async function acFlag(target, reason, by) {
+  if (!target || !target.uid) return;
+  const why = clip(reason, 120);
+  console.warn(`[anticheat] ${target.name} (${target.uid}): ${why} — โดย ${by ? by.name : "?"}`);
+  try {
+    await acReady();
+    await db.execute({ sql: "INSERT INTO st_ac (user_id, reason, created_at) VALUES (?, ?, ?)", args: [target.uid, why, nowSec()] });
+    await repReady();
+    await db.execute({
+      sql: "INSERT INTO st_reports (reporter_id, target, reason, note, room, chat, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)",
+      args: [by && by.uid ? by.uid : target.uid, clip(target.name, 32), "cheat", "[ระบบกันโกง] " + why, clip(target.room ? target.room.code : "", 12), "", nowSec()],
+    });
+  } catch (e) { console.error("acFlag failed:", e); }
+}
+async function acFlagged(uid) {
+  await acReady();
+  const r = await db.execute({ sql: "SELECT 1 FROM st_ac WHERE user_id = ? AND created_at > ? LIMIT 1", args: [uid, nowSec() - AC_DAYS * 86400] });
+  return r.rows.length > 0;
 }
 
 async function doStReports(ws, m) {
@@ -540,7 +569,7 @@ function loadPrevChar(ws) {
 function createRoom(ws, m, user) {
   const code = newCode();
   if (!code) return send(ws, { t: "error", msg: "server_full" });
-  const room = { code, pvp: !!m.pvp, peers: new Map(), nextId: 2 };
+  const room = { code, pvp: !!m.pvp, peers: new Map(), nextId: 2, banned: new Set() };
   ws.pid = 1;
   ws.name = user.name;
   ws.uid = user.id;
@@ -557,6 +586,7 @@ function joinRoom(ws, m, user) {
   const code = String(m.code || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
   const room = rooms.get(code);
   if (!room) return send(ws, { t: "error", msg: "no_room" });
+  if (room.banned && room.banned.has(user.id)) return send(ws, { t: "error", msg: "banned" });
   if (room.peers.size >= MAX_PLAYERS) return send(ws, { t: "error", msg: "room_full" });
   ws.pid = room.nextId++;
   ws.name = user.name;
@@ -565,11 +595,11 @@ function joinRoom(ws, m, user) {
   loadPrevChar(ws);
   claimOnline(ws, user.id);
   ws.room = room;
-  const others = [...room.peers.entries()].map(([id, p]) => ({ id, name: p.name }));
+  const others = [...room.peers.entries()].map(([id, p]) => ({ id, name: p.name, admin: !!p.admin }));
   room.peers.set(ws.pid, ws);
   send(ws, { t: "joined", code, id: ws.pid, pvp: room.pvp, peers: others });
   for (const [id, p] of room.peers) {
-    if (id !== ws.pid) send(p, { t: "peer_join", id: ws.pid, name: ws.name });
+    if (id !== ws.pid) send(p, { t: "peer_join", id: ws.pid, name: ws.name, admin: !!ws.admin });
   }
 }
 
@@ -695,8 +725,32 @@ wss.on("connection", (ws, req) => {
           .finally(() => { ws.busy = false; });
         break;
       }
+      case "room_kick": {
+        // โฮสต์เตะ (ระบบกันโกงหรือแอดมิน): ตัดออกจากห้องที่เซิร์ฟเวอร์ + ห้ามกลับเข้าห้องนี้
+        const room = ws.room;
+        if (!room || ws.pid !== 1) return;
+        const target = room.peers.get(Number(m.id));
+        if (!target || target === ws) return;
+        const reason = clip(m.reason, 80);
+        if (target.uid) room.banned.add(target.uid);
+        if (reason && !reason.startsWith("แอดมิน")) acFlag(target, "ถูกเตะ: " + reason, ws);
+        send(target, { t: "kicked_room", reason });
+        leave(target);
+        break;
+      }
+      case "ac_report": {
+        // ตัวเกมรายงานตัวเอง (ตรวจเจอที่เครื่อง) หรือโฮสต์รายงานคนในห้อง
+        const room = ws.room;
+        if (!room || !ws.uid) return;
+        if (limited("ac:" + ws.uid, 6)) return;
+        bump("ac:" + ws.uid);
+        const tid = Number(m.target);
+        const target = tid === ws.pid ? ws : (ws.pid === 1 ? room.peers.get(tid) : null);
+        if (target) acFlag(target, m.reason, ws);
+        break;
+      }
       case "ping":
-        send(ws, { t: "pong", c: m.c });
+        send(ws, { t: "pong", c: m.c, now: Date.now() }); // now = ให้เกมเทียบจับ speed hack
         break;
       case "leave":
         leave(ws);
