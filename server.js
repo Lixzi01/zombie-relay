@@ -118,6 +118,7 @@ function limited(key, max) {
   return h.n >= max;
 }
 function bump(key) {
+  if (hits.size > 50000 && !hits.has(key)) return; // กันหน่วยความจำบวม
   const h = hits.get(key);
   if (!h || Date.now() - h.first > FAIL_WINDOW_MS) hits.set(key, { n: 1, first: Date.now() });
   else h.n++;
@@ -215,13 +216,23 @@ async function doStScore(ws, m) {
   const user = await userFromToken(m.token);
   if (!user) return;
   if (await acFlagged(user.id)) return; // ติดธงกันโกง ไม่รับคะแนน
-  // คะแนนที่เป็นไปไม่ได้ (ตัวเกมถูกแก้): ฆ่าเกินวันละ 400 ตัว หรือรอบเกินวันละ 4 รอบ
+  await stReady();
+  // เทียบกับสถิติเดิมในฐานข้อมูล + เวลาจริงที่ผ่านไป (ไม่เชื่อตัวเลข "วัน" ที่เกมส่งมาอย่างเดียว)
+  // ในเกม 1 วัน = ~24 นาทีจริง (นอนข้ามได้) จึงยอมให้เพิ่มได้ไม่เกิน 1 วันต่อ 5 นาทีจริง
+  const prev = (await db.execute({ sql: "SELECT best_kills, best_days, best_wave, updated_at FROM st_stats WHERE user_id = ?", args: [user.id] })).rows[0];
+  const elapsed = prev ? Math.max(0, nowSec() - Number(prev.updated_at)) : 0;
+  const maxDays = prev ? Number(prev.best_days) + 1 + Math.floor(elapsed / 300) : 30;
+  const maxKills = prev ? Number(prev.best_kills) + 300 + elapsed * 3 : 3000;
+  const maxWave = prev ? Number(prev.best_wave) + 5 + Math.floor(elapsed / 60) : 40;
   const days = Math.max(1, stInt(m.days));
-  if (stInt(m.kills) > days * 400 + 300 || stInt(m.wave) > days * 4 + 5) {
-    acFlag({ uid: user.id, name: user.name, room: ws.room }, `คะแนนเป็นไปไม่ได้ (ฆ่า ${stInt(m.kills)} ใน ${days} วัน, รอบ ${stInt(m.wave)})`, null);
+  const bad = days > maxDays ? `วันเกินจริง (${days} > ${maxDays})`
+    : stInt(m.kills) > days * 400 + 300 ? `ฆ่า ${stInt(m.kills)} ใน ${days} วัน`
+    : stInt(m.kills) > maxKills ? `ฆ่าเพิ่มเร็วเกินจริง (${stInt(m.kills)} > ${maxKills})`
+    : stInt(m.wave) > days * 4 + 5 || stInt(m.wave) > maxWave ? `รอบ ${stInt(m.wave)} เกินจริง` : "";
+  if (bad) {
+    acFlag({ uid: user.id, name: user.name, room: ws.room }, "คะแนนเป็นไปไม่ได้: " + bad, null);
     return;
   }
-  await stReady();
   await db.execute({
     sql: `INSERT INTO st_stats (user_id, best_kills, best_days, best_wave, updated_at) VALUES (?, ?, ?, ?, ?)
       ON CONFLICT(user_id) DO UPDATE SET best_kills = MAX(best_kills, MIN(excluded.best_kills, best_kills + 3000)),
@@ -232,8 +243,8 @@ async function doStScore(ws, m) {
 }
 
 async function doStBoard(ws) {
-  if (limited("st:" + ws.ip, 60)) return send(ws, { t: "error", msg: "rate_limited" });
-  bump("st:" + ws.ip);
+  if (limited("stb:" + ws.ip, 60)) return send(ws, { t: "error", msg: "rate_limited" });
+  bump("stb:" + ws.ip);
   await stReady();
   if (!stCache || Date.now() - stAt > 30e3) {
     const q = (col) => db.execute(`SELECT u.name AS name, s.${col} AS v FROM st_stats s JOIN users u ON u.id = s.user_id
@@ -283,13 +294,18 @@ function acReady() {
     id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL, reason TEXT NOT NULL, created_at INTEGER NOT NULL)`));
   return acTable;
 }
-async function acFlag(target, reason, by) {
+// flag = true: ติดธงจริง (ปิดอันดับ 3 วัน) ใช้ได้เฉพาะเซิร์ฟเวอร์ตรวจเอง หรือเกมรายงานตัวเอง
+// flag = false: แค่ลงรายงานให้แอดมินดู (โฮสต์รายงานคนอื่น — โฮสต์อาจกลั่นแกล้งได้)
+async function acFlag(target, reason, by, flag = true) {
   if (!target || !target.uid) return;
   const why = clip(reason, 120);
-  console.warn(`[anticheat] ${target.name} (${target.uid}): ${why} — โดย ${by ? by.name : "?"}`);
+  console.warn(`[anticheat] ${target.name} (${target.uid}): ${why} — โดย ${by ? by.name : "?"}${flag ? "" : " (รายงานเท่านั้น)"}`);
   try {
     await acReady();
-    await db.execute({ sql: "INSERT INTO st_ac (user_id, reason, created_at) VALUES (?, ?, ?)", args: [target.uid, why, nowSec()] });
+    if (flag) await db.execute({ sql: "INSERT INTO st_ac (user_id, reason, created_at) VALUES (?, ?, ?)", args: [target.uid, why, nowSec()] });
+    // รายงานซ้ำคนเดิมภายใน 1 วัน ไม่ต้องลงซ้ำ (กันรายการแอดมินถูกท่วม)
+    if (limited("acrep:" + target.uid, 1)) return;
+    bump("acrep:" + target.uid);
     await repReady();
     await db.execute({
       sql: "INSERT INTO st_reports (reporter_id, target, reason, note, room, chat, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)",
@@ -628,7 +644,9 @@ function leave(ws) {
 }
 
 wss.on("connection", (ws, req) => {
-  const xff = String((req.headers && req.headers["x-forwarded-for"]) || "").split(",")[0].trim();
+  // ใช้ IP ตัวท้ายสุดที่ proxy ของ Render เติมเอง (ตัวแรกผู้เล่นปลอมได้)
+  const xffList = String((req.headers && req.headers["x-forwarded-for"]) || "").split(",").map((x) => x.trim()).filter(Boolean);
+  const xff = xffList.length ? xffList[xffList.length - 1] : "";
   ws.ip = xff || (req.socket && req.socket.remoteAddress) || "?";
   ws.busy = false; // กำลังรอฐานข้อมูลอยู่ (กันส่งคำสั่งซ้อน)
   ws.alive = true;
@@ -739,7 +757,9 @@ wss.on("connection", (ws, req) => {
         if (!target || target === ws) return;
         const reason = clip(m.reason, 80);
         if (target.uid) room.banned.add(target.uid);
-        if (reason && !reason.startsWith("แอดมิน")) acFlag(target, "ถูกเตะ: " + reason, ws);
+        if (limited("kick:" + ws.uid, 20)) break;
+        bump("kick:" + ws.uid);
+        if (reason && !reason.startsWith("แอดมิน")) acFlag(target, "ถูกโฮสต์เตะ: " + reason, ws, false);
         send(target, { t: "kicked_room", reason });
         leave(target);
         break;
@@ -752,7 +772,7 @@ wss.on("connection", (ws, req) => {
         bump("ac:" + ws.uid);
         const tid = Number(m.target);
         const target = tid === ws.pid ? ws : (ws.pid === 1 ? room.peers.get(tid) : null);
-        if (target) acFlag(target, m.reason, ws);
+        if (target) acFlag(target, m.reason, ws, target === ws); // รายงานตัวเอง = ติดธงจริง, โฮสต์รายงานคนอื่น = แค่รายงาน
         break;
       }
       case "ping":
@@ -780,6 +800,12 @@ setInterval(() => {
 
 // ถัง rate limit เติมทุกวินาที
 setInterval(() => { for (const ws of wss.clients) ws.bucket = MAX_MSGS_PER_SEC; }, 1000).unref();
+
+// ล้างตัวนับ rate limit ที่หมดเวลาแล้ว ทุกนาที
+setInterval(() => {
+  const t = Date.now();
+  for (const [k, h] of hits) if (t - h.first > FAIL_WINDOW_MS) hits.delete(k);
+}, 60 * 1000).unref();
 
 // ล้างเซสชันหมดอายุ + ตัวนับ rate limit ที่เก่าแล้ว ทุกชั่วโมง
 setInterval(() => {
