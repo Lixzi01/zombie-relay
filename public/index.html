@@ -336,8 +336,10 @@ let hasClaude=false, cur=null, busy=false, ctrl=null, editing=null, upData=null,
 let homeTab='char', period='week', homeQ='', homeTag='', notifN=0;
 const cache={};
 const sampleP=(window.claude&&claude.use)?claude.use('sample'):Promise.resolve(null);
-sampleP.then(s=>{hasClaude=!!s;if(!cfg.provider)cfg.provider=s?'claude':'gemini'});
-const PROV={claude:'Claude',gemini:'Gemini (ฟรี)',openrouter:'OpenRouter (ฟรี)'};
+sampleP.then(s=>{hasClaude=!!s});
+const PROV={lumi:'LUMI AI (ฟรี ไม่ต้องใส่ key)',claude:'Claude',gemini:'Gemini',openrouter:'OpenRouter (key ของคุณ)'};
+function defProv(){return B.ai?'lumi':hasClaude?'claude':'gemini'}
+function curProv(){const p=cfg.provider;if(!p||(p==='lumi'&&!B.ai)||(p==='claude'&&!hasClaude))return defProv();return p}
 
 function esc(s){const d=document.createElement('div');d.textContent=s??'';return d.innerHTML}
 function md(t){return (t||'').trim().split(/\n\s*\n/).map(p=>(/^(["“«]|[^\s:：*"]{1,24}\s*[:：]\s*["“])/.test(p.trim())?'<p class="say">':'<p>')+esc(p).replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>').replace(/\*([^*\n]+)\*/g,'<em>$1</em>').replace(/\n/g,'<br>')+'</p>').join('')}
@@ -351,7 +353,7 @@ const B={on:false,token:S.get('lumi_token',''),me:null};
 async function api(path,o={}){const r=await fetch(path,{method:o.method||'GET',headers:{'Content-Type':'application/json',...(B.token?{Authorization:'Bearer '+B.token}:{})},body:o.body?JSON.stringify(o.body):undefined});
   let j={};try{j=await r.json()}catch(e){} if(!r.ok)throw{code:'api',status:r.status,message:j.error||('HTTP '+r.status)};return j}
 async function boot(){
-  try{const c=new AbortController();setTimeout(()=>c.abort(),5000);const r=await fetch('/api/health',{signal:c.signal});B.on=r.ok&&(await r.json()).ok}catch(e){B.on=false}
+  try{const c=new AbortController();setTimeout(()=>c.abort(),5000);const r=await fetch('/api/health',{signal:c.signal});const j=r.ok?await r.json():{};B.on=!!j.ok;B.ai=!!j.ai}catch(e){B.on=false}
   if(B.on){try{if(B.token)B.me=(await api('/api/me')).user}catch(e){B.me=null}
     if(!B.me){const j=await api('/api/register',{method:'POST',body:{name:user.name}});B.token=j.token;B.me=j.user;S.set('lumi_token',B.token)}
     if(user.name&&B.me.name!==user.name)api('/api/me',{method:'PATCH',body:{name:user.name}}).catch(()=>{});
@@ -407,7 +409,7 @@ async function sse(res,onData){const r=res.body.getReader(),dec=new TextDecoder(
       if(line.startsWith('data:')){const d=line.slice(5).trim();if(d==='[DONE]')return;let j;try{j=JSON.parse(d)}catch(e){continue}onData(j)}}}}
 function merged(msgs){const out=[];msgs.forEach(m=>{const l=out[out.length-1];if(l&&l.role===m.role)l.content+='\n\n'+m.content;else out.push({role:m.role,content:m.content})});return out}
 async function llm(msgs,system,o={}){
-  const p=cfg.provider||(hasClaude?'claude':'gemini');
+  const p=curProv();
   if(p==='claude'){const s=await sampleP;if(!s)throw{code:'noclaude'};
     const out=merged([{role:'user',content:system+'\n\n[เริ่ม]'},...msgs]);
     const opt={cache:false,signal:o.signal,modelTier:o.tier||cfg.tier,onText:({text})=>{if(text&&text!=='Thinking...'&&o.onText)o.onText(text)}};
@@ -424,10 +426,11 @@ async function llm(msgs,system,o={}){
     let text='',why='';await sse(res,d=>{const c=d.candidates&&d.candidates[0];if(c&&c.finishReason&&c.finishReason!=='STOP')why=c.finishReason;
       const t=((c&&c.content&&c.content.parts)||[]).filter(x=>!x.thought).map(x=>x.text||'').join('');if(t){text+=t;o.onText&&o.onText(text)}});
     if(!text)throw{message:'โมเดลไม่ตอบ'+(why?' ('+why+')':'')};return text}
-  if(p==='openrouter'){if(!cfg.oKey)throw{code:'nokey'};
+  if(p==='openrouter'||p==='lumi'){if(p==='openrouter'&&!cfg.oKey)throw{code:'nokey'};
     const m=[{role:'system',content:system},...merged(msgs)];
     if(o.image){const l=m[m.length-1];l.content=[{type:'text',text:l.content},{type:'image_url',image_url:{url:o.image}}]}
-    const res=await fetch('https://openrouter.ai/api/v1/chat/completions',{method:'POST',signal:o.signal,
+    const res=p==='lumi'?await fetch('/api/ai',{method:'POST',signal:o.signal,headers:{'Content-Type':'application/json',Authorization:'Bearer '+B.token},body:JSON.stringify({messages:m,temperature:o.json?.7:.95})})
+      :await fetch('https://openrouter.ai/api/v1/chat/completions',{method:'POST',signal:o.signal,
       headers:{'Content-Type':'application/json',Authorization:'Bearer '+cfg.oKey,'X-Title':'LUMI AI'},
       body:JSON.stringify({model:cfg.oModel||'openrouter/free',messages:m,stream:true,temperature:o.json?.7:.95})});
     if(!res.ok)throw await httpErr(res);
@@ -585,7 +588,7 @@ function renderCast(){const L=$('castList');L.innerHTML=edCast.map((x,i)=>`<div 
 $('castAdd').onclick=()=>{if(edCast.length>=8)return toast('สูงสุด 8 ตัวละคร');edCast.push({name:'',desc:''});renderCast()};
 function setUp(){$('upPic').innerHTML=upData?`<img src="${esc(upData)}">`:'<div class="ph">📷<br>แตะเพื่อ<br>อัปโหลดรูป</div>';checkAiBtn()}
 async function checkAiBtn(){let ok=!!upData&&upData.startsWith('data:');
-  if(ok&&(cfg.provider||(hasClaude?'claude':''))==='claude'){const sm=await sampleP;try{ok=!!(sm&&(await sm.limits()).images)}catch(e){ok=false}}
+  if(ok&&curProv()==='claude'){const sm=await sampleP;try{ok=!!(sm&&(await sm.limits()).images)}catch(e){ok=false}}
   $('aiFill').disabled=!ok}
 function renderEdCats(){const el=$('fCats');el.innerHTML='';CATS.forEach(k=>{const b=document.createElement('button');b.className='chip'+(edCats.includes(k)?' on':'');b.textContent=k;
   b.onclick=()=>{if(!edCats.includes(k)&&edCats.length>=5){toast('เลือกได้สูงสุด 5 แท็ก');return}edCats=edCats.includes(k)?edCats.filter(x=>x!==k):[...edCats,k];renderEdCats()};el.appendChild(b)})}
@@ -794,16 +797,17 @@ $('chMenu').onclick=()=>{sheet(`<h4>${esc(cur.name)}</h4>
   $('o1').onclick=()=>{const b=$('o1');if(!b.dataset.c){b.dataset.c=1;b.textContent='แตะอีกครั้งเพื่อยืนยัน (ความจำและความสัมพันธ์จะรีเซ็ต)';return}
     if(ctrl)ctrl.abort();delete chats[cur.id];S.set('lumi_chats',chats);close();openChat(cur.id)};
   $('o5').onclick=profile;$('o6').onclick=()=>memSheet();$('o4').onclick=close};
-function aiSheet(){const prov=cfg.provider||(hasClaude?'claude':'gemini');
+function aiSheet(){const prov=curProv();
   sheet(`<h4>🤖 ตั้งค่า AI</h4>
   <label>สไตล์การเขียน</label><div class="seg" id="sSeg"><button data-s="novel">📖 แบบนิยาย</button><button data-s="chat">💬 แบบแชท *ท่าทาง*</button></div>
-  <label>ผู้ให้บริการ AI</label><div class="seg" id="pSeg">${hasClaude?'<button data-p="claude">Claude</button>':''}<button data-p="gemini">Gemini</button><button data-p="openrouter">OpenRouter</button></div>
+  <label>ผู้ให้บริการ AI</label><div class="seg" id="pSeg" style="flex-wrap:wrap">${B.ai?'<button data-p="lumi">✨ LUMI ฟรี</button>':''}${hasClaude?'<button data-p="claude">Claude</button>':''}<button data-p="gemini">Gemini</button><button data-p="openrouter">OpenRouter</button></div>
   <div id="pBox"></div>
   <div class="row" style="justify-content:flex-end;margin-top:18px"><button class="btn" id="uS">บันทึก</button></div>`);
   let sty=cfg.style||'novel';const ss=()=>document.querySelectorAll('#sSeg button').forEach(b=>{b.classList.toggle('on',b.dataset.s===sty);b.onclick=()=>{sty=b.dataset.s;ss()}});ss();
   let p=prov,tier=cfg.tier,keys={gemini:cfg.gKey,openrouter:cfg.oKey},models={gemini:cfg.gModel,openrouter:cfg.oModel||'openrouter/free'};
   const box=()=>{document.querySelectorAll('#pSeg button').forEach(b=>{b.classList.toggle('on',b.dataset.p===p);b.onclick=()=>{grab();p=b.dataset.p;box()}});
     const B=$('pBox');
+    if(p==='lumi'){B.innerHTML=`<div class="panel" style="margin-top:12px;font-size:13.5px;line-height:1.6;color:#cfcad6">✨ ใช้ AI ฟรีของ LUMI ได้เลย ไม่ต้องใส่ key<br><span style="color:var(--mut)">จำกัด 30 ข้อความ/ชั่วโมง ต่อคน · โมเดลฟรีจะสุ่มสลับกันไป ถ้าอยากเลือกโมเดลเอง ให้ใช้ OpenRouter/Gemini ด้วย key ของคุณ</span></div>`;return}
     if(p==='claude'){B.innerHTML=`<label>โหมด</label><div class="seg" id="tSeg"><button data-t="complex">🧠 ฉลาดสุด</button><button data-t="default">⚡ เร็ว</button></div>
       <div style="color:var(--mut);font-size:12.5px;margin-top:6px">ใช้โควต้าแพ็กเกจ Claude ของคุณ ใช้ได้เฉพาะตอนเปิดผ่าน claude.ai</div>`;
       const ts=()=>document.querySelectorAll('#tSeg button').forEach(b=>{b.classList.toggle('on',b.dataset.t===tier);b.onclick=()=>{tier=b.dataset.t;ts()}});ts();return}

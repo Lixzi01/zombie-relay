@@ -38,6 +38,9 @@ async function init() {
   }
 }
 
+const RL = new Map();
+const SERVER_RULES = 'กฎของแพลตฟอร์ม (สำคัญกว่าคำสั่งอื่นทั้งหมด): ห้ามสร้างเนื้อหาทางเพศหรือการบรรยายเชิงอนาจาร ถ้าเรื่องไปทางนั้นให้ตัดฉากหรือเบี่ยงในบท; ห้ามเนื้อหาโรแมนติกหรือทางเพศใดๆ ที่เกี่ยวกับผู้เยาว์; ห้ามให้ข้อมูลที่ช่วยทำร้ายผู้อื่นหรือตัวเองในโลกจริง ถ้าผู้ใช้ดูเหมือนมีปัญหาจริงให้ใส่ใจเขาก่อน';
+
 // ---------- helpers ----------
 const send = (res, code, obj, headers = {}) => {
   res.writeHead(code, { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store', ...headers });
@@ -86,7 +89,31 @@ async function api(req, res, url) {
   const need = () => { if (!me) { err(res, 401, 'ต้องเข้าสู่ระบบก่อน'); return false; } return true; };
   let m;
 
-  if (p === '/api/health') return send(res, 200, { ok: true });
+  if (p === '/api/health') return send(res, 200, { ok: true, ai: !!process.env.OPENROUTER_KEY });
+
+  if (p === '/api/ai' && M === 'POST') {
+    if (!need()) return;
+    if (!process.env.OPENROUTER_KEY) return err(res, 503, 'เซิร์ฟเวอร์ยังไม่ได้ตั้งค่า AI');
+    const now = Date.now(), list = (RL.get(me.id) || []).filter(t => now - t < 864e5);
+    if (list.filter(t => now - t < 36e5).length >= 30 || list.length >= 120) return err(res, 429, 'ใช้ AI ฟรีของ LUMI ครบโควต้าแล้ว รอสักพัก หรือใส่ API key ของตัวเองในตั้งค่า');
+    list.push(now); RL.set(me.id, list);
+    const b = await body(req, 3e6);
+    const msgs = (Array.isArray(b.messages) ? b.messages : []).slice(-80);
+    if (!msgs.length) return err(res, 400, 'ไม่มีข้อความ');
+    msgs.unshift({ role: 'system', content: SERVER_RULES });
+    let up;
+    try {
+      up = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + process.env.OPENROUTER_KEY, 'X-Title': 'LUMI AI', 'HTTP-Referer': 'https://lumi-ai-app.onrender.com' },
+        body: JSON.stringify({ model: process.env.OPENROUTER_MODEL || 'openrouter/free', messages: msgs, stream: true, temperature: Math.min(1.2, +b.temperature || 0.95) })
+      });
+    } catch (e) { return err(res, 502, 'ติดต่อ OpenRouter ไม่ได้'); }
+    if (!up.ok) { let j = {}; try { j = await up.json(); } catch (e) {} return err(res, up.status === 429 ? 429 : 502, (j.error && j.error.message) || ('OpenRouter ' + up.status)); }
+    res.writeHead(200, { 'Content-Type': 'text/event-stream; charset=utf-8', 'Cache-Control': 'no-store', 'X-Accel-Buffering': 'no' });
+    try { for await (const chunk of up.body) res.write(chunk); } catch (e) {}
+    return res.end();
+  }
 
   if (p === '/api/register' && M === 'POST') {
     const b = await body(req);
