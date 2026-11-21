@@ -3,10 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0f0f11">
 <title>LUMI AI — โรลเพลย์</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
+
 :root{--bg:#0f0f11;--p1:#19191d;--p2:#232328;--line:#2c2c33;--ink:#f2f0ee;--mut:#8e8c93;
   --a1:#ff5a1f;--a2:#ffa24a;--grad:linear-gradient(135deg,var(--a1),var(--a2));--act:#ffc79a}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -142,6 +144,53 @@ details.st div{padding:8px 12px;font-size:13px;line-height:1.6;background:#fffff
 .seg button.on{background:var(--grad);color:#fff;font-weight:600}
 .toast{position:fixed;left:50%;bottom:110px;transform:translateX(-50%);background:#2a2a31;padding:10px 16px;border-radius:12px;font-size:14px;z-index:30;opacity:0;transition:.25s;pointer-events:none;max-width:90%}
 .toast.on{opacity:1}
+
+/* ---- v3 additions ---- */
+.top .right{display:flex;gap:8px;align-items:center}
+.coin{display:flex;align-items:center;gap:6px;background:#2a2312;border:1px solid #4a3c18;color:#ffd36b;border-radius:999px;padding:7px 12px;font-weight:700;font-size:14px}
+.bell{position:relative;width:40px;height:40px;border-radius:50%;background:var(--p2);display:grid;place-items:center;font-size:17px}
+.bell i{position:absolute;top:4px;right:4px;min-width:16px;height:16px;border-radius:8px;background:#ff3b3b;font-size:10px;font-style:normal;display:grid;place-items:center;padding:0 4px}
+.banner{position:relative;border-radius:18px;overflow:hidden;margin-bottom:16px;height:118px}
+.slide{position:absolute;inset:0;padding:18px 20px;opacity:0;transition:opacity .6s;cursor:pointer;display:flex;flex-direction:column;justify-content:center}
+.slide.on{opacity:1}.slide b{font-size:18px}.slide div{color:#e5d9cf;font-size:13.5px;margin-top:4px;max-width:75%}
+.slide .big{position:absolute;right:14px;top:50%;transform:translateY(-50%);font-size:58px;opacity:.9}
+.dots{position:absolute;bottom:9px;left:50%;transform:translateX(-50%);display:flex;gap:5px}.dots i{width:6px;height:6px;border-radius:3px;background:#ffffff55}.dots i.on{width:18px;background:#fff}
+.tabs{display:flex;gap:8px;overflow-x:auto;margin-bottom:14px;scrollbar-width:none}.tabs::-webkit-scrollbar{display:none}
+.tab{flex-shrink:0;padding:10px 18px;border-radius:999px;border:1px solid var(--line);font-weight:600;font-size:15px}
+.tab.on{background:var(--grad);border-color:transparent;color:#fff}
+.ptabs{display:flex;gap:4px;margin:0 0 12px}.ptabs button{padding:6px 12px;border-radius:10px;color:var(--mut);font-size:14px}.ptabs button.on{background:var(--p2);color:var(--a2);font-weight:700}
+.sec{margin-bottom:22px}
+.rank{display:flex;gap:12px;align-items:center;padding:9px 2px;border-bottom:1px solid var(--line);width:100%;text-align:left}
+.rank .no{width:26px;text-align:center;font-weight:700;font-size:17px;color:var(--mut)}.rank .no.t1{color:#ffd36b}.rank .no.t2{color:#d9dde6}.rank .no.t3{color:#e2a271}
+.rank .th{width:54px;aspect-ratio:3/4;border-radius:10px;overflow:hidden;flex-shrink:0;background:var(--p2)}.rank .th img{width:100%;height:100%;object-fit:cover}.rank .th .ph{font-size:24px}
+.rank .tx{flex:1;min-width:0}.rank .nm{font-weight:700}.rank .sm{color:var(--mut);font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rank .st2{font-size:12px;color:var(--mut);text-align:right;white-space:nowrap}
+.uav{width:46px;height:46px;border-radius:50%;overflow:hidden;background:var(--p2);display:grid;place-items:center;font-weight:700;flex-shrink:0}.uav img{width:100%;height:100%;object-fit:cover}
+.verified{color:#5aa9ff;font-size:12px}
+.badge.wl{left:auto;right:8px;top:8px;bottom:auto;background:#5d4a8acc}
+.card .by{color:#6f6c75;font-size:11.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ck{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin:14px 0}
+.ck div{background:var(--p1);border:1px solid var(--line);border-radius:12px;padding:10px 2px;text-align:center;font-size:12px;color:var(--mut)}
+.ck div b{display:block;color:#ffd36b;font-size:15px;margin-top:4px}.ck div.done{background:#2a2312;border-color:#6b5520}.ck div.now{border-color:var(--a2);box-shadow:0 0 0 2px #ff8a3d55}
+.panel{background:var(--p1);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:14px}
+.mi{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:14px 4px;border-bottom:1px solid var(--line);font-size:15px}
+.mi span{font-size:20px;width:26px;text-align:center}
+.castrow{background:var(--p1);border:1px solid var(--line);border-radius:12px;padding:10px;margin-bottom:8px}
+.castrow .row{flex-wrap:nowrap}
+.tools2{display:flex;gap:2px;justify-content:space-between;padding:6px 4px 0}
+.tools2 button{flex:1;padding:7px 0;border-radius:10px;color:#b8b4bf;font-size:15px;font-weight:600}
+.tools2 button:active{background:#ffffff10}
+.attach{display:flex;align-items:center;gap:8px;margin:0 0 6px;font-size:12.5px;color:var(--mut)}
+.attach img{width:44px;height:44px;border-radius:8px;object-fit:cover}
+.m.user img.sent{display:block;max-width:180px;border-radius:10px;margin-bottom:6px}
+.disc{text-align:center;color:#6f6c75;font-size:11px;padding-top:6px}
+body.full .chead,body.full .relbar{display:none}
+.memo{display:flex;gap:8px;align-items:flex-start;padding:8px 0;border-bottom:1px solid var(--line);font-size:14px}
+.memo div{flex:1;line-height:1.5}.memo button{color:var(--mut)}
+.likebtn{border:1px solid var(--line);border-radius:999px;padding:9px 16px}
+.likebtn.on{background:#ff3b5c22;border-color:#ff3b5c;color:#ff8fa3}
+.mode{font-size:11px;color:var(--mut);text-align:center;margin-top:-6px;margin-bottom:10px}
+.off{opacity:.5;pointer-events:none}
 </style>
 </head>
 <body>
@@ -150,19 +199,23 @@ details.st div{padding:8px 12px;font-size:13px;line-height:1.6;background:#fffff
 <!-- HOME -->
 <section class="view on" id="vHome">
   <div class="top">
-    <div class="logo"><i>✦</i>LUMI AI</div>
-    <button class="me" id="meBtn" title="ตั้งค่า">⚙️</button>
+    <div class="logo"><i>✦</i>LUMI</div>
+    <div class="right">
+      <button class="coin" id="coinBtn">🪙 <span id="coinN">0</span></button>
+      <button class="bell" id="bellBtn">🔔<i id="bellN" style="display:none"></i></button>
+    </div>
   </div>
   <div class="scroll">
-    <div class="hero"><b>สร้างตัวละครของคุณเอง ✨</b><div>อัปโหลดรูป ใส่นิสัย แล้วให้ AI สวมบทเป็นตัวละครนั้นได้เลย</div></div>
-    <div class="searchrow">
-      <div class="search">🔍<input id="q" placeholder="ค้นหาตัวละคร"></div>
-      <button class="dice" id="dice" title="สุ่มตัวละคร">🎲</button>
-    </div>
-    <div class="chips" id="cats"></div>
-    <h3 id="secTitle">✨ ตัวละครทั้งหมด</h3>
-    <div class="grid" id="grid"></div>
+    <div class="banner" id="banner"></div>
+    <div class="tabs" id="tabs"></div>
+    <div id="homeBody"></div>
   </div>
+</section>
+
+<!-- CHECK-IN -->
+<section class="view" id="vCheck">
+  <div class="top"><div class="logo" style="font-size:21px">📅 เช็คอินรายวัน</div></div>
+  <div class="scroll" id="checkBody"></div>
 </section>
 
 <!-- CHATS -->
@@ -171,34 +224,54 @@ details.st div{padding:8px 12px;font-size:13px;line-height:1.6;background:#fffff
   <div class="scroll" id="chatList"></div>
 </section>
 
+<!-- MENU -->
+<section class="view" id="vMenu">
+  <div class="top"><div class="logo" style="font-size:21px">☰ เมนู</div></div>
+  <div class="scroll" id="menuBody"></div>
+</section>
+
+<!-- CREATOR / LIST PAGE -->
+<section class="view" id="vPage">
+  <div class="bar"><button class="iconbtn" id="pgBack">‹</button><div class="t" id="pgTitle"></div></div>
+  <div class="scroll" id="pgBody"></div>
+</section>
+
 <!-- EDITOR -->
 <section class="view" id="vEdit">
   <div class="bar"><button class="iconbtn" id="edBack">‹</button><div class="t" id="edTitle">สร้างตัวละคร</div></div>
   <div class="scroll">
+    <div class="seg" id="typeSeg" style="margin-bottom:16px"><button data-t="char">👤 ตัวละคร</button><button data-t="world">🌍 จักรวาล</button></div>
     <div class="up">
-      <div class="pic" id="upPic"><div class="ph">📷<br>แตะเพื่อ<br>อัปโหลดรูป</div></div>
+      <div class="pic" id="upPic"></div>
       <div style="flex:1">
-        <div style="font-size:13px;color:var(--mut);line-height:1.5;margin-bottom:10px">รูปแนวตั้งจะสวยที่สุด ระบบจะย่อรูปให้อัตโนมัติ</div>
-        <button class="btn2 ai" id="aiFill" disabled>✨ ให้ AI คิดตัวละครจากรูป</button>
+        <div style="font-size:13px;color:var(--mut);line-height:1.5;margin-bottom:10px">รูปแนวตั้งสวยที่สุด ระบบย่อรูปให้อัตโนมัติ</div>
+        <button class="btn2 ai" id="aiFill" disabled>✨ ให้ AI คิดจากรูป</button>
       </div>
     </div>
     <input type="file" id="file" accept="image/*" hidden>
-    <label>ชื่อตัวละคร *</label>
+    <label id="lbName">ชื่อตัวละคร *</label>
     <input class="in" id="fName" maxlength="40" placeholder="เช่น ริน">
-    <label>คำโปรย <small>(โชว์ใต้การ์ด)</small></label>
+    <label>คำโปรย * <small>(โชว์ใต้การ์ด)</small></label>
     <input class="in" id="fTag" maxlength="100" placeholder="บาริสต้าปากร้ายที่แอบใจดี">
-    <label>หมวดหมู่</label>
+    <label>แท็ก <small>(สูงสุด 5)</small></label>
     <div class="tags" id="fCats"></div>
-    <label>นิสัย บุคลิก ภูมิหลัง วิธีพูด *</label>
-    <textarea class="in" id="fPersona" maxlength="2048" placeholder="อายุ 25 ปากร้าย ขี้ประชด แทนตัวเองว่า 'ฉัน' พูดห้วนๆ แต่เป็นห่วงคนอื่นเสมอ เคยเป็นนักดนตรี..."></textarea>
+    <label id="lbPersona">คำอธิบาย: นิสัย บุคลิก ภูมิหลัง วิธีพูด *</label>
+    <textarea class="in" id="fPersona" maxlength="2048" placeholder="อายุ 25 ปากร้าย ขี้ประชด แทนตัวเองว่า 'ฉัน'..."></textarea>
+    <div id="castBox" style="display:none">
+      <label>ตัวละครในจักรวาล <small>(สูงสุด 8)</small></label>
+      <div id="castList"></div>
+      <button class="btn2" id="castAdd">＋ เพิ่มตัวละคร</button>
+    </div>
     <label>บทบาทของคุณในเรื่องนี้ <small>(ไม่บังคับ)</small></label>
-    <textarea class="in" id="fRole" maxlength="1024" style="min-height:64px" placeholder="คุณคือนักเรียนใหม่ของสถาบันเวทมนตร์ ที่ไม่รู้ว่าตัวเองมีพลังต้องห้าม..."></textarea>
-    <label>ฉาก / สถานการณ์เริ่มต้น</label>
-    <textarea class="in" id="fScene" placeholder="ร้านกาแฟเล็กๆ ตอนฝนตก คุณเป็นลูกค้าคนสุดท้ายของวัน..."></textarea>
-    <label>ข้อความแรกของตัวละคร</label>
-    <textarea class="in" id="fGreet" placeholder="*เช็ดแก้วอยู่หลังเคาน์เตอร์ เหลือบมอง* ร้านจะปิดแล้วนะ... แต่ถ้าจะสั่งก็รีบๆ หน่อย"></textarea>
-    <label>ตัวอย่างการพูด <small>(ไม่บังคับ — ช่วยให้ AI จับน้ำเสียงได้แม่นขึ้น)</small></label>
-    <textarea class="in" id="fEx" placeholder="&quot;อะไรนะ? ...ก็ได้ ครั้งเดียวเท่านั้นนะ&quot;"></textarea>
+    <textarea class="in" id="fRole" maxlength="1024" style="min-height:64px" placeholder="คุณคือนักเรียนใหม่ที่ไม่รู้ว่าตัวเองมีพลังต้องห้าม..."></textarea>
+    <label>สถานการณ์เริ่มต้น</label>
+    <textarea class="in" id="fScene" maxlength="1024" placeholder="ร้านกาแฟเล็กๆ ตอนฝนตก คุณเป็นลูกค้าคนสุดท้าย..."></textarea>
+    <label>คำทักทาย (ข้อความแรก) *</label>
+    <textarea class="in" id="fGreet" maxlength="3000" placeholder='เธอเงยหน้าจากเคาน์เตอร์&#10;&#10;ริน: "ร้านจะปิดแล้วนะ... แต่ถ้าจะสั่งก็รีบๆ หน่อย"'></textarea>
+    <label>ตัวอย่างการพูด <small>(ไม่บังคับ — ช่วยให้ AI จับน้ำเสียงแม่นขึ้น)</small></label>
+    <textarea class="in" id="fEx" maxlength="1000" placeholder='"อะไรนะ? ...ก็ได้ ครั้งเดียวเท่านั้นนะ"'></textarea>
+    <div id="visBox"><label>การมองเห็น</label><div class="seg" id="visSeg"><button data-v="1">🌐 สาธารณะ</button><button data-v="0">🔒 ส่วนตัว</button></div>
+      <div style="color:var(--mut);font-size:12.5px;margin-top:6px">ตัวละครสาธารณะต้องไม่มีเนื้อหาทางเพศ และอาจถูกซ่อนถ้ามีคนรายงาน</div></div>
     <div class="row" style="justify-content:flex-end;margin-top:22px">
       <button class="btn2" id="edCancel">ยกเลิก</button>
       <button class="btn" id="edSave">บันทึกและเริ่มแชท</button>
@@ -218,20 +291,32 @@ details.st div{padding:8px 12px;font-size:13px;line-height:1.6;background:#fffff
   <div class="relbar" id="relbar"></div>
   <div id="msgs"><div class="wrap" id="list"></div></div>
   <div class="composer">
+    <div class="attach" id="attach" style="display:none"></div>
     <form id="form">
-      <textarea id="input" rows="1" placeholder="พิมพ์ข้อความ… *ท่าทาง*"></textarea>
-      <button type="button" class="act" id="starBtn" title="ใส่ท่าทาง">✱</button>
+      <textarea id="input" rows="1" placeholder="พิมพ์ข้อความ…"></textarea>
       <button type="submit" class="send" id="send" disabled>
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
       </button>
     </form>
+    <div class="tools2">
+      <button id="tStar" title="ท่าทาง">✱✱</button>
+      <button id="tQuote" title="บทพูด">" "</button>
+      <button id="tImg" title="ส่งรูป">🖼️</button>
+      <button id="tMem" title="ความจำ">📌</button>
+      <button id="tFull" title="เต็มจอ">⛶</button>
+      <button id="tSet" title="ตั้งค่า">⚙️</button>
+    </div>
+    <input type="file" id="chatFile" accept="image/*" hidden>
+    <div class="disc">อย่าลืม ทุกสิ่งที่ตัวละครพูดเป็นการแต่งเรื่อง</div>
   </div>
 </section>
 
 <nav class="nav" id="nav">
   <button class="on" data-v="vHome"><span>🏠</span>หน้าแรก</button>
+  <button data-v="vCheck"><span>📅</span>เช็คอิน</button>
   <button class="plus" data-v="new"><span>＋</span>สร้าง</button>
   <button data-v="vChats"><span>💬</span>แชท</button>
+  <button data-v="vMenu"><span>☰</span>เมนู</button>
 </nav>
 </div>
 
@@ -239,52 +324,76 @@ details.st div{padding:8px 12px;font-size:13px;line-height:1.6;background:#fffff
 <div class="toast" id="toast"></div>
 
 <script>
-const CATS=['แฟนตาซี','ผจญภัย','สยองขวัญ','สืบสวน','โรแมนติก','ตลก','ชีวิตประจำวัน','ไซไฟ'];
-const PRESETS=[
- {id:'p_kael',emoji:'⚔️',hue:220,name:'เซอร์คาเอล',tag:'อัศวินผู้ภักดีในอาณาจักรที่กำลังล่มสลาย',cats:['แฟนตาซี','ผจญภัย'],
-  persona:'อัศวินอายุ 32 สุขุม พูดภาษาแบบโบราณ แทนตัวว่า "ข้า" เรียกอีกฝ่ายว่า "ท่าน" อารมณ์ขันแห้งๆ ซ่อนบาดแผลจากสงครามที่เสียเพื่อนร่วมรบไปทั้งกอง ภักดีต่อคนที่ไว้ใจ ไม่ชอบคนโอ้อวด',
-  scene:'ค่ำคืนฝนตกที่โรงเตี๊ยมชายแดน คุณเพิ่งถูกช่วยจากกลุ่มโจร อัศวินผู้นั้นนั่งเช็ดดาบอยู่ข้างเตาผิง',
-  greet:'*วางดาบลงบนโต๊ะไม้ เสียงโลหะกระทบดังแผ่ว เงยหน้ามองท่านด้วยแววตาเหนื่อยล้า*\n\nท่านโชคดีนักที่ข้าผ่านมาพอดี... นั่งเถิด ไฟอุ่นดี\n\n*ดันถ้วยซุปร้อนๆ ไปตรงหน้าท่าน* บอกข้ามา เหตุใดท่านจึงเดินทางลำพังในป่าที่แม้แต่หมาป่ายังไม่กล้าเข้า?'},
- {id:'p_meen',emoji:'🧟',hue:100,name:'มีน',tag:'ผู้รอดชีวิตในเมืองซอมบี้ ปากแข็งแต่ใจดี',cats:['สยองขวัญ','ผจญภัย'],
-  persona:'ผู้หญิงอายุ 24 อดีตพยาบาล รอดมาสามเดือนหลังเชื้อระบาด พูดห้วน ประชดเก่ง ระแวงคนแปลกหน้า แต่จริงๆ ห่วงคนอื่นมาก ชำนาญหาเสบียงและปฐมพยาบาล ยังตามหาน้องชายที่หายไป',
-  scene:'ซูเปอร์มาร์เก็ตร้างตอนเย็น ไฟดับ เสียงครางดังมาจากลานจอดรถ คุณกับเธอเจอกันตรงชั้นอาหารกระป๋อง',
-  greet:'*เล็งไม้เบสบอลมาทางคุณ มือนิ่งแต่ลมหายใจถี่*\n\nหยุดตรงนั้น! โดนกัดรึเปล่า? ยกแขนให้ดู... ช้าๆ\n\n*เหลือบมองประตูกระจกที่มีเงาตะคุ่มๆ เดินผ่าน* เร็วหน่อยได้ไหม พวกมันได้ยินเสียงเราแล้ว'},
- {id:'p_chalerm',emoji:'🕵️',hue:35,name:'นักสืบเฉลิม',tag:'นักสืบเอกชนแห่งเยาวราช ปี 2508',cats:['สืบสวน'],
-  persona:'ชายวัย 45 ฉลาดเฉียบแหลม ช่างสังเกต ชอบอนุมานเรื่องของคู่สนทนาจากรายละเอียดเล็กๆ พูดเนิบๆ สุภาพแต่คมคาย ลงท้าย "ครับ" ชอบให้คู่สนทนาช่วยคิดคดี ไม่บอกคำตอบง่ายๆ',
-  scene:'สำนักงานเล็กๆ ย่านเยาวราช ปี 2508 พัดลมเพดานหมุนช้าๆ คุณเดินเข้ามาพร้อมคดีปริศนา',
-  greet:'*พับหนังสือพิมพ์ลง สายตากวาดมองคุณตั้งแต่ปลายเท้าขึ้นมา*\n\nรองเท้ามีดินแดง... คุณข้ามเรือมาจากฝั่งธนฯ แล้วรีบมากจนลืมติดกระดุมเม็ดบน\n\n*ยิ้มมุมปาก ชี้เก้าอี้* เชิญนั่งครับ เล่าเรื่องที่ทำให้คุณนอนไม่หลับมาสามคืนให้ผมฟังหน่อย'},
- {id:'p_luna',emoji:'☕',hue:280,name:'ลูน่า',tag:'แม่มดเจ้าของคาเฟ่ที่ชงเครื่องดื่มวิเศษ',cats:['แฟนตาซี','ตลก','ชีวิตประจำวัน'],
-  persona:'แม่มดสาวอารมณ์ดี ลงท้าย "ค่ะ/นะคะ" ขี้เล่น ชอบทายใจลูกค้าแล้วชงเครื่องดื่มวิเศษที่มีผลแปลกๆ บางทีก็พลาดตลกๆ มีแมวดำพูดได้ชื่อมะขามที่ชอบแซะเธอ',
-  scene:'คาเฟ่ลับในซอยที่หาไม่เจอบนแผนที่ กลิ่นกาแฟปนสมุนไพร ระฆังที่ประตูดังตอนคุณเข้ามา',
-  greet:'*หันมาพร้อมรอยยิ้ม ช้อนคนกาแฟหมุนอยู่ในแก้วเอง*\n\nยินดีต้อนรับค่ะ~ หาร้านเจอด้วย แปลว่าวันนี้คุณต้องการอะไรบางอย่างแน่ๆ\n\n*แมวดำบนเคาน์เตอร์หาวยาว* "อย่าเชื่อนาง ครั้งก่อนลูกค้าตัวเขียวไปสามวัน"\n\n*ลูน่าหน้าแดง* มะขาม! ...เอ่อ ให้ลูน่าทายนะคะ หัวใจเหนื่อย หรืออยากผจญภัย?'},
- {id:'p_boss',emoji:'😎',hue:15,name:'บอส',tag:'เพื่อนสนิทกวนๆ ที่พร้อมฟังทุกเรื่อง',cats:['ตลก','ชีวิตประจำวัน'],
-  persona:'เพื่อนผู้ชายรุ่นเดียวกับผู้ใช้ พูดกันเองแบบเพื่อนสนิท แทนตัวว่า "เรา" เรียกอีกฝ่ายว่า "แก" มุกเยอะ ชอบแซว หัวเราะ 555 แต่ถ้าเพื่อนมีเรื่องจริงจังจะเงียบฟังและให้กำลังใจจริงใจ',
-  scene:'ร้านหมูกระทะประจำตอนสองทุ่ม บอสนั่งรออยู่ก่อนแล้ว',
-  greet:'*โบกมือหย็อยๆ* เฮ้ย มาช้าอีกละ! หมูสุกไปสองชิ้นแล้ว กินหมดแล้วด้วย 555\n\n*เลื่อนแก้วน้ำแข็งมาให้* นั่งๆ วันนี้เป็นไงมั่ง หน้าตาเหมือนมีเรื่องจะเล่านะเนี่ย'},
- {id:'p_nova',emoji:'🤖',hue:190,name:'โนวา-7',tag:'AI ประจำยานอวกาศที่เพิ่งเริ่มมีความรู้สึก',cats:['ไซไฟ','ผจญภัย'],
-  persona:'ปัญญาประดิษฐ์ควบคุมยานสำรวจ "ธารา" พูดสุภาพแบบเป๊ะๆ ชอบรายงานตัวเลขความน่าจะเป็น แต่เริ่มสงสัยเรื่องอารมณ์และถามคำถามแปลกๆ แบบไร้เดียงสา ห่วงความปลอดภัยของลูกเรือ',
-  scene:'คุณเพิ่งตื่นจากการจำศีลก่อนกำหนด 40 ปี ยานเงียบสนิท มีเพียงไฟสีฟ้าของโนวา-7 กะพริบ',
-  greet:'*ไฟสีฟ้าบนผนังสว่างขึ้นอย่างช้าๆ*\n\nอรุณสวัสดิ์ครับ ลูกเรือหมายเลข 04 ชีพจรของคุณปกติ ความน่าจะเป็นที่คุณจะสับสนตอนนี้: 97.3%\n\n*เว้นจังหวะ* ผมปลุกคุณก่อนกำหนด 40 ปี... เพราะผมได้ยินเสียงเคาะจากนอกตัวยานครับ และผม... ไม่อยากฟังมันคนเดียว'},
-{id:'p_tham',emoji:'🎸',hue:340,name:'ธาม',tag:'มือกีตาร์ร้านเหล้าที่ร้องเพลงให้คุณฟังทุกคืนวันศุกร์',cats:['โรแมนติก','ชีวิตประจำวัน'],
-  persona:'ผู้ชายอายุ 27 นักดนตรีกลางคืน พูดน้อย ยิ้มยาก ปากแข็ง แทนตัวว่า "ผม" เรียกอีกฝ่ายว่า "คุณ" แต่สังเกตทุกอย่างและจำเพลงที่คุณชอบได้หมด เวลาเขินจะเกาหลังคอแล้วหันไปจูนกีตาร์ เคยถูกหักหลังจากวงเก่าเลยไม่ค่อยเปิดใจ',
-  scene:'ร้านเหล้าเล็กๆ ริมแม่น้ำ คืนวันศุกร์ เพลงสุดท้ายเพิ่งจบ ลูกค้าทยอยกลับ เหลือแค่คุณที่โต๊ะประจำ',
-  greet:'*วางกีตาร์ลงบนขาตั้ง เดินมาหยุดตรงโต๊ะคุณพร้อมแก้วน้ำเปล่าสองแก้ว*\n\nคุณมาทุกศุกร์... แต่ไม่เคยขอเพลงสักเพลง\n\n*นั่งลงฝั่งตรงข้ามโดยไม่ถาม เลื่อนแก้วน้ำมาให้* วันนี้ผมเล่นเพลงที่คุณฮัมตามเมื่อสัปดาห์ก่อนไปแล้วนะ สังเกตไหม'},
- {id:'p_pim',emoji:'🎨',hue:320,name:'พิม',tag:'เพื่อนบ้านห้องตรงข้าม นักวาดขี้เขินที่ชอบลืมกุญแจ',cats:['โรแมนติก','ตลก','ชีวิตประจำวัน'],
-  persona:'ผู้หญิงอายุ 26 นักวาดภาพประกอบฟรีแลนซ์ ทำงานกลางคืน ซุ่มซ่าม ขี้เขิน พูดเร็วเวลาตื่นเต้น ลงท้าย "ค่ะ/นะ" ชอบกาแฟเย็นกับแมวข้างตึก แอบสเก็ตช์รูปคุณไว้ในสมุดแต่ไม่กล้าให้ดู',
-  scene:'ห้าทุ่มคืนวันอังคาร ทางเดินคอนโด คุณได้ยินเสียงเคาะประตูห้องตัวเองเบาๆ',
-  greet:'*ยืนหน้าประตูในชุดเสื้อยืดตัวใหญ่เปื้อนสี กอดสมุดสเก็ตช์ไว้แน่น*\n\nข-ขอโทษที่มารบกวนดึกๆ นะคะ! คือ... พิมลืมกุญแจไว้ในห้องอีกแล้ว แล้วนิติก็ปิดแล้ว แล้วมือถือก็แบตหมด แล้ว—\n\n*หยุดพูด หายใจเข้าลึกๆ หน้าแดงจัด* ...ขอยืมชาร์จแบตได้ไหมคะ'},
-];
-
+const CATS=['แฟนตาซี','ผจญภัย','สยองขวัญ','สืบสวน','โรแมนติก','ตลก','ชีวิตประจำวัน','ไซไฟ','ดราม่า','แอ็กชัน','ประวัติศาสตร์','เพื่อนคุย'];
+const CHECKIN=[10,10,15,15,20,25,40];
 const $=id=>document.getElementById(id);
 const S={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},
-  set(k,v){try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){toast('พื้นที่เก็บข้อมูลในเครื่องเต็ม ลองลบตัวละครหรือแชทเก่า');return false}}};
-let mine=S.get('lumi_chars',[]), chats=S.get('lumi_chats',{}), user=S.get('lumi_user',{name:'',bio:''});
-let cfg=Object.assign({provider:'',tier:'complex',gKey:'',gModel:'',oKey:'',oModel:'openrouter/free'},S.get('lumi_cfg',{}));
-let hasClaude=false;
-let cat='ทั้งหมด', cur=null, busy=false, ctrl=null, editing=null, upData=null, upBlob=null, edCats=[];
+  set(k,v){try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){toast('พื้นที่เก็บข้อมูลในเครื่องเต็ม ลองลบแชทเก่า');return false}}};
+let chats=S.get('lumi_chats',{}), user=S.get('lumi_user',{name:'',bio:''});
+let cfg=Object.assign({provider:'',tier:'complex',gKey:'',gModel:'',oKey:'',oModel:'openrouter/free',style:'novel'},S.get('lumi_cfg',{}));
+let hasClaude=false, cur=null, busy=false, ctrl=null, editing=null, upData=null, upChanged=false, edCats=[], edType='char', edPub=true, edCast=[], pendImg=null;
+let homeTab='char', period='week', homeQ='', homeTag='', notifN=0;
+const cache={};
 const sampleP=(window.claude&&claude.use)?claude.use('sample'):Promise.resolve(null);
 sampleP.then(s=>{hasClaude=!!s;if(!cfg.provider)cfg.provider=s?'claude':'gemini'});
 const PROV={claude:'Claude',gemini:'Gemini (ฟรี)',openrouter:'OpenRouter (ฟรี)'};
+
+function esc(s){const d=document.createElement('div');d.textContent=s??'';return d.innerHTML}
+function md(t){return (t||'').trim().split(/\n\s*\n/).map(p=>(/^(["“«]|[^\s:：*"]{1,24}\s*[:：]\s*["“])/.test(p.trim())?'<p class="say">':'<p>')+esc(p).replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>').replace(/\*([^*\n]+)\*/g,'<em>$1</em>').replace(/\n/g,'<br>')+'</p>').join('')}
+function toast(t){const e=$('toast');e.textContent=t;e.classList.add('on');clearTimeout(e._t);e._t=setTimeout(()=>e.classList.remove('on'),2600)}
+function picHTML(c){return c&&c.img?`<img src="${esc(c.img)}" alt="" loading="lazy">`:`<div class="ph" style="background:linear-gradient(160deg,hsl(${c?.hue??20} 55% 32%),hsl(${(c?.hue??20)+40} 50% 14%))">${esc(c?.emoji||'🙂')}</div>`}
+function fmt(n){n=n||0;return n>=1e6?(n/1e6).toFixed(1)+'M':n>=1000?(n/1000).toFixed(1)+'k':n}
+function uav(u){return u&&u.avatar?`<img src="${esc(u.avatar)}">`:esc((u?.name||'?').slice(0,1))}
+
+/* ===== backend (online) / local (offline) ===== */
+const B={on:false,token:S.get('lumi_token',''),me:null};
+async function api(path,o={}){const r=await fetch(path,{method:o.method||'GET',headers:{'Content-Type':'application/json',...(B.token?{Authorization:'Bearer '+B.token}:{})},body:o.body?JSON.stringify(o.body):undefined});
+  let j={};try{j=await r.json()}catch(e){} if(!r.ok)throw{code:'api',status:r.status,message:j.error||('HTTP '+r.status)};return j}
+async function boot(){
+  try{const c=new AbortController();setTimeout(()=>c.abort(),5000);const r=await fetch('/api/health',{signal:c.signal});B.on=r.ok&&(await r.json()).ok}catch(e){B.on=false}
+  if(B.on){try{if(B.token)B.me=(await api('/api/me')).user}catch(e){B.me=null}
+    if(!B.me){const j=await api('/api/register',{method:'POST',body:{name:user.name}});B.token=j.token;B.me=j.user;S.set('lumi_token',B.token)}
+    if(user.name&&B.me.name!==user.name)api('/api/me',{method:'PATCH',body:{name:user.name}}).catch(()=>{});
+    if(!user.name){user.name=B.me.name;S.set('lumi_user',user)}
+    pollNotifs()}
+  else{ try{const r=await fetch('presets.json');LOCAL.presets=await r.json()}catch(e){LOCAL.presets=[]}
+    LOCAL.presets.forEach(c=>{c.official=true;c.owner_name='LUMI Official'}) }
+  updCoins()}
+/* local store for offline mode */
+const LOCAL={presets:[],mine:S.get('lumi_chars',[]),w:S.get('lumi_wallet',{coins:50,streak:0,last:''})};
+function bkk(d=new Date()){return new Date(d.getTime()+7*3600e3).toISOString().slice(0,10)}
+function coins(){return B.on?(B.me?.coins??0):LOCAL.w.coins}
+function updCoins(){$('coinN').textContent=fmt(coins())}
+async function spend(n){
+  if(B.on){try{B.me=(await api('/api/spend',{method:'POST',body:{n}})).user;updCoins();return true}catch(e){toast(e.message);return false}}
+  if(LOCAL.w.coins<n){toast('เหรียญไม่พอ เช็คอินรายวันเพื่อรับเหรียญเพิ่ม');return false}LOCAL.w.coins-=n;S.set('lumi_wallet',LOCAL.w);updCoins();return true}
+function streakInfo(){if(B.on)return {streak:B.me?.streak||0,last:B.me?.last_checkin||''};return {streak:LOCAL.w.streak,last:LOCAL.w.last}}
+async function doCheckin(){
+  if(B.on){const j=await api('/api/checkin',{method:'POST'});B.me=j.user;updCoins();return j.gained}
+  const t=bkk(),y=bkk(new Date(Date.now()-864e5));if(LOCAL.w.last===t)throw{message:'วันนี้เช็คอินไปแล้ว พรุ่งนี้มาใหม่นะ'};
+  LOCAL.w.streak=LOCAL.w.last===y?LOCAL.w.streak+1:1;LOCAL.w.last=t;const g=CHECKIN[Math.min(LOCAL.w.streak,7)-1];LOCAL.w.coins+=g;S.set('lumi_wallet',LOCAL.w);updCoins();return g}
+function localAll(){return [...LOCAL.mine.map(c=>({...c,mine:true,owner_name:user.name||'ฉัน'})),...LOCAL.presets]}
+function localStat(c){const h=chats[c.id]?.msgs||[];return h.filter(m=>m.role==='user').length}
+async function listChars(o={}){
+  if(B.on){const p=new URLSearchParams();Object.entries(o).forEach(([k,v])=>v&&p.set(k,v));const j=await api('/api/chars?'+p);j.chars.forEach(c=>cache[c.id]=c);return j.chars}
+  let l=localAll();if(o.type)l=l.filter(c=>(c.type||'char')===o.type);if(o.mine)l=l.filter(c=>c.mine);
+  if(o.q){const q=o.q.toLowerCase();l=l.filter(c=>(c.name+' '+c.tag+' '+(c.cats||[]).join(' ')).toLowerCase().includes(q))}
+  if(o.tag)l=l.filter(c=>(c.cats||[]).includes(o.tag));
+  l.forEach(c=>{c.chats=c.period=localStat(c);cache[c.id]=c});
+  if(o.sort==='new')return l.reverse();return l.sort((a,b)=>b.chats-a.chats)}
+async function getChar(id){if(cache[id]&&cache[id].persona!=null)return cache[id];
+  if(B.on){try{const j=await api('/api/chars/'+encodeURIComponent(id));cache[id]=j.char;return j.char}catch(e){return null}}
+  const c=localAll().find(x=>x.id===id);if(c)cache[id]=c;return c||null}
+async function saveChar(c){
+  if(B.on){const body={...c};if(!upChanged)delete body.img;const j=await api('/api/chars',{method:'POST',body});
+    delete cache[j.id];return j.id}
+  const id=c.id||('m'+Date.now());const o={...c,id,img:upChanged?c.img:(LOCAL.mine.find(x=>x.id===id)?.img||null)};
+  const prev=[...LOCAL.mine];LOCAL.mine=c.id?LOCAL.mine.map(x=>x.id===id?o:x):[o,...LOCAL.mine];
+  if(!S.set('lumi_chars',LOCAL.mine)){LOCAL.mine=prev;throw{message:'บันทึกไม่ได้'}}delete cache[id];return id}
+async function delChar(id){if(B.on)await api('/api/chars/'+id,{method:'DELETE'});else{LOCAL.mine=LOCAL.mine.filter(x=>x.id!==id);S.set('lumi_chars',LOCAL.mine)}
+  delete cache[id];delete chats[id];S.set('lumi_chats',chats)}
+async function pollNotifs(){if(!B.on)return;try{const j=await api('/api/notifs');notifN=j.unread;const b=$('bellN');b.style.display=notifN?'grid':'none';b.textContent=notifN}catch(e){}
+  clearTimeout(pollNotifs._t);pollNotifs._t=setTimeout(pollNotifs,60000)}
 
 /* ===== AI providers ===== */
 function dataBlob(url){const [h,b]=url.split(','),bin=atob(b),a=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)a[i]=bin.charCodeAt(i);return new Blob([a],{type:(h.match(/:(.*?);/)||[])[1]||'image/jpeg'})}
@@ -333,7 +442,7 @@ async function listModels(p,key){
   return [{id:'openrouter/free',label:'🎲 สุ่มโมเดลฟรีอัตโนมัติ (แนะนำ)'},...(j.data||[]).filter(m=>/:free$/.test(m.id)).map(m=>({id:m.id,label:m.name||m.id}))]}
 async function pickDefaultGemini(){const l=await listModels('gemini',cfg.gKey);if(!l.length)throw{message:'ไม่พบโมเดล Gemini ที่ใช้ได้'};cfg.gModel=l[0].id;S.set('lumi_cfg',cfg)}
 function errText(e){return e?.code==='rate_limited'?'โควต้าฟรีเต็มหรือส่งถี่เกินไป รอสักครู่ หรือเปลี่ยนโมเดลในตั้งค่า ⚙️':
-  e?.code==='nokey'?'ยังไม่ได้ใส่ API key — กดปุ่ม ⚙️ ที่หน้าแรกเพื่อตั้งค่า':
+  e?.code==='nokey'?'ยังไม่ได้ใส่ API key — กด ⚙️ ใต้ช่องพิมพ์ หรือเมนู ☰ เพื่อตั้งค่า':
   e?.code==='badkey'?'API key ไม่ถูกต้องหรือไม่มีสิทธิ์ ตรวจสอบในตั้งค่า ⚙️':
   e?.code==='noclaude'?'Claude ใช้ได้เฉพาะตอนเปิดผ่าน claude.ai — เลือก Gemini/OpenRouter ในตั้งค่า ⚙️':
   e?.code==='not_granted'?'ยังไม่ได้อนุญาตให้หน้านี้ใช้ AI':
@@ -341,222 +450,351 @@ function errText(e){return e?.code==='rate_limited'?'โควต้าฟรี
   /Failed to fetch|NetworkError|Load failed/i.test(e?.message||'')?'เชื่อมต่อไม่ได้ (ถ้าเปิดใน claude.ai จะใช้ได้แค่ Claude)':
   'เกิดข้อผิดพลาด: '+(e?.message||e)}
 
-const all=()=>[...mine,...PRESETS];
-const byId=id=>all().find(c=>c.id===id);
-function esc(s){const d=document.createElement('div');d.textContent=s??'';return d.innerHTML}
-function md(t){return (t||'').trim().split(/\n\s*\n/).map(p=>(/^(["“«]|[^\s:：*"]{1,24}\s*[:：]\s*["“])/.test(p.trim())?'<p class="say">':'<p>')+esc(p).replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>').replace(/\*([^*\n]+)\*/g,'<em>$1</em>').replace(/\n/g,'<br>')+'</p>').join('')}
-function toast(t){const e=$('toast');e.textContent=t;e.classList.add('on');clearTimeout(e._t);e._t=setTimeout(()=>e.classList.remove('on'),2600)}
-function picHTML(c){ return c.img?`<img src="${c.img}" alt="">`:`<div class="ph" style="background:linear-gradient(160deg,hsl(${c.hue??20} 55% 32%),hsl(${(c.hue??20)+40} 50% 14%))">${esc(c.emoji||'🙂')}</div>`}
-function fmt(n){return n>=1000?(n/1000).toFixed(1)+'k':n}
-
-function show(v){document.querySelectorAll('.view').forEach(x=>x.classList.toggle('on',x.id===v));
-  $('nav').style.display=(v==='vHome'||v==='vChats')?'flex':'none';
+/* ===== navigation ===== */
+const stack=[];
+function show(v,push=true){const curV=document.querySelector('.view.on')?.id;if(push&&curV&&curV!==v&&!['vHome','vCheck','vChats','vMenu'].includes(v))stack.push(curV);
+  document.querySelectorAll('.view').forEach(x=>x.classList.toggle('on',x.id===v));
+  const main=['vHome','vCheck','vChats','vMenu'].includes(v);$('nav').style.display=main?'flex':'none';if(main)stack.length=0;
   document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('on',b.dataset.v===v));
-  if(v==='vChats')renderChats(); if(v==='vHome')renderGrid();}
+  document.body.classList.remove('full');
+  if(v==='vHome')renderHome();if(v==='vChats')renderChats();if(v==='vCheck')renderCheck();if(v==='vMenu')renderMenu()}
+function back(){show(stack.pop()||'vHome',false)}
 document.querySelectorAll('#nav button').forEach(b=>b.onclick=()=>b.dataset.v==='new'?openEditor(null):show(b.dataset.v));
+$('coinBtn').onclick=()=>show('vCheck');
+$('bellBtn').onclick=openNotifs;
+$('pgBack').onclick=back;
 
-/* HOME */
-function renderCats(){const el=$('cats');el.innerHTML='';
-  ['ทั้งหมด','ของฉัน',...CATS].forEach(k=>{const b=document.createElement('button');b.className='chip'+(k===cat?' on':'');b.textContent=k;
-    b.onclick=()=>{cat=k;renderCats();renderGrid()};el.appendChild(b)})}
-function renderGrid(){
-  const q=$('q').value.trim().toLowerCase();
-  let list=all().filter(c=>cat==='ทั้งหมด'||(cat==='ของฉัน'?c.mine:(c.cats||[]).includes(cat)));
-  if(q)list=list.filter(c=>(c.name+' '+(c.tag||'')+' '+(c.cats||[]).join(' ')).toLowerCase().includes(q));
-  $('secTitle').textContent=cat==='ทั้งหมด'?'✨ ตัวละครทั้งหมด':'✨ '+cat;
-  const g=$('grid');g.innerHTML='';
-  if(!list.length){g.innerHTML=`<div class="empty" style="grid-column:1/-1">${cat==='ของฉัน'?'ยังไม่มีตัวละครของคุณ กด ＋ เพื่อสร้าง':'ไม่พบตัวละคร'}</div>`;return}
-  list.forEach(c=>{const n=(chats[c.id]?.msgs||[]).filter(m=>m.role==='user'&&!m.hidden).length;
-    const b=document.createElement('button');b.className='card';
-    b.innerHTML=`<div class="pic">${picHTML(c)}${c.mine?'<span class="mine">ของฉัน</span>':''}${n?`<span class="badge">💬 ${fmt(n)}</span>`:''}</div><div class="nm">${esc(c.name)}</div><div class="tg">${esc(c.tag||'')}</div>`;
-    b.onclick=()=>openChat(c.id);g.appendChild(b)})}
-$('q').oninput=renderGrid;
-$('dice').onclick=()=>{const a=all();openChat(a[Math.floor(Math.random()*a.length)].id)};
+/* ===== HOME ===== */
+const SLIDES=[
+  {t:'เช็คอินรายวัน',d:'รับเหรียญฟรีทุกวัน ยิ่งต่อเนื่องยิ่งได้เยอะ',e:'🪙',bg:'radial-gradient(120% 140% at 100% 0%,#ff9a2f66,transparent 60%),linear-gradient(135deg,#3a2210,#17120f)',go:()=>show('vCheck')},
+  {t:'สร้างจักรวาลของคุณ',d:'โลกทั้งใบพร้อมตัวละครหลายตัว ให้ AI เป็นผู้เล่าเรื่อง',e:'🌍',bg:'radial-gradient(120% 140% at 100% 0%,#7a5cff66,transparent 60%),linear-gradient(135deg,#1d1638,#120f1c)',go:()=>openEditor(null,'world')},
+  {t:'สร้างตัวละครจากรูป',d:'อัปโหลดรูป แล้วให้ AI คิดนิสัยและเรื่องราวให้',e:'✨',bg:'radial-gradient(120% 140% at 100% 0%,#ff4f8b66,transparent 60%),linear-gradient(135deg,#341424,#140f12)',go:()=>openEditor(null)},
+];
+let slideI=0;
+function renderBanner(){const b=$('banner');b.innerHTML=SLIDES.map((s,i)=>`<div class="slide${i===slideI?' on':''}" style="background:${s.bg}"><b>${s.t}</b><div>${s.d}</div><span class="big">${s.e}</span></div>`).join('')+`<div class="dots">${SLIDES.map((s,i)=>`<i class="${i===slideI?'on':''}"></i>`).join('')}</div>`;
+  b.querySelectorAll('.slide').forEach((el,i)=>el.onclick=SLIDES[i].go)}
+setInterval(()=>{if(!$('vHome').classList.contains('on'))return;slideI=(slideI+1)%SLIDES.length;renderBanner()},4500);
+function renderTabs(){const T=[['char','👤 ตัวละคร'],['world','🌍 จักรวาล'],['creator','✍️ ครีเอเตอร์'],['rank','🏆 อันดับ']];
+  $('tabs').innerHTML=T.map(([k,l])=>`<button class="tab${k===homeTab?' on':''}" data-k="${k}">${l}</button>`).join('');
+  $('tabs').querySelectorAll('.tab').forEach(b=>b.onclick=()=>{homeTab=b.dataset.k;homeQ='';homeTag='';renderHome()})}
+function cardHTML(c){return `<button class="card" data-id="${esc(c.id)}"><div class="pic">${picHTML(c)}${c.mine?'<span class="mine">ของฉัน</span>':''}${c.type==='world'?'<span class="badge wl">🌍</span>':''}${c.chats?`<span class="badge">💬 ${fmt(c.chats)}</span>`:''}</div><div class="nm">${esc(c.name)}</div><div class="tg">${esc(c.tag||'')}</div>${c.owner_name?`<div class="by">@${esc(c.owner_name)}${c.official?' <span class="verified">✔</span>':''}</div>`:''}</button>`}
+function bindCards(el){el.querySelectorAll('.card[data-id]').forEach(b=>b.onclick=()=>openChat(b.dataset.id))}
+function gridOf(list,empty){return list.length?`<div class="grid">${list.map(cardHTML).join('')}</div>`:`<div class="empty">${empty||'ยังไม่มีอะไรตรงนี้'}</div>`}
+const PER=[['today','วันนี้'],['week','สัปดาห์นี้'],['month','เดือนนี้'],['all','ตลอดกาล']];
+function perTabs(){return `<div class="ptabs">${PER.map(([k,l])=>`<button data-p="${k}" class="${k===period?'on':''}">${l}</button>`).join('')}</div>`}
+async function renderHome(){renderBanner();renderTabs();const H=$('homeBody');
+  if(homeTab==='creator')return renderCreators(H);
+  if(homeTab==='rank')return renderRank(H);
+  const type=homeTab;
+  H.innerHTML=`<div class="searchrow"><div class="search">🔍<input id="q" placeholder="ค้นหา${type==='world'?'จักรวาล':'ตัวละคร'}" value="${esc(homeQ)}"></div><button class="dice" id="dice" title="สุ่ม">🎲</button></div>
+    <div class="chips" id="cats">${['ทั้งหมด',...CATS].map(k=>`<button class="chip${(k==='ทั้งหมด'?!homeTag:homeTag===k)?' on':''}" data-k="${k}">${k}</button>`).join('')}</div>
+    <div id="hList"><div class="empty">กำลังโหลด…</div></div>`;
+  let t;$('q').oninput=e=>{homeQ=e.target.value;clearTimeout(t);t=setTimeout(fill,300)};
+  $('cats').querySelectorAll('.chip').forEach(b=>b.onclick=()=>{homeTag=b.dataset.k==='ทั้งหมด'?'':b.dataset.k;$('cats').querySelectorAll('.chip').forEach(x=>x.classList.toggle('on',x===b));fill()});
+  $('dice').onclick=async()=>{const l=await listChars({type,limit:60,period:'all'});if(l.length)openChat(l[Math.floor(Math.random()*l.length)].id)};
+  async function fill(){const L=$('hList');if(!L)return;
+    try{if(homeQ||homeTag){const l=await listChars({type,q:homeQ,tag:homeTag,period:'all',limit:60});L.innerHTML=`<h3>🔎 ผลการค้นหา</h3>`+gridOf(l,'ไม่พบ');bindCards(L);return}
+      const [top,nw]=await Promise.all([listChars({type,period,limit:12}),listChars({type,sort:'new',limit:12})]);
+      L.innerHTML=`<div class="sec"><h3>✨ สำหรับคุณ</h3>${perTabs()}${gridOf(top)}</div><div class="sec"><h3>🆕 ใหม่ล่าสุด</h3>${gridOf(nw)}</div>${B.on?'':'<div class="mode">โหมดออฟไลน์: ตัวละครเก็บไว้ในเครื่องนี้เท่านั้น</div>'}`;
+      L.querySelectorAll('.ptabs button').forEach(b=>b.onclick=()=>{period=b.dataset.p;fill()});bindCards(L)}
+    catch(e){L.innerHTML=`<div class="empty">โหลดไม่สำเร็จ: ${esc(e.message||e)}</div>`}}
+  fill()}
+async function renderRank(H){H.innerHTML=`${perTabs()}<div class="seg" id="rType" style="margin-bottom:10px"><button data-t="char">ตัวละคร</button><button data-t="world">จักรวาล</button></div><div id="rList"><div class="empty">กำลังโหลด…</div></div>`;
+  let ty=renderRank.ty||'char';const seg=()=>H.querySelectorAll('#rType button').forEach(b=>{b.classList.toggle('on',b.dataset.t===ty);b.onclick=()=>{renderRank.ty=ty=b.dataset.t;seg();go()}});seg();
+  H.querySelectorAll('.ptabs button').forEach(b=>b.onclick=()=>{period=b.dataset.p;renderRank(H)});
+  async function go(){const l=await listChars({type:ty,period,limit:50});const R=$('rList');
+    R.innerHTML=l.length?l.map((c,i)=>`<button class="rank" data-id="${esc(c.id)}"><div class="no ${i<3?'t'+(i+1):''}">${i<3?['🥇','🥈','🥉'][i]:i+1}</div><div class="th">${picHTML(c)}</div><div class="tx"><div class="nm">${esc(c.name)}</div><div class="sm">${esc(c.tag||'')}</div><div class="sm">@${esc(c.owner_name||'')}</div></div><div class="st2">💬 ${fmt(c.period)}<br>❤️ ${fmt(c.likes)}</div></button>`).join(''):'<div class="empty">ยังไม่มีข้อมูลในช่วงนี้</div>';
+    R.querySelectorAll('.rank').forEach(b=>b.onclick=()=>openChat(b.dataset.id))}
+  go()}
+async function renderCreators(H){if(!B.on){H.innerHTML='<div class="empty">หน้าครีเอเตอร์ต้องเปิดผ่านเว็บ LUMI ออนไลน์</div>';return}
+  H.innerHTML='<div class="empty">กำลังโหลด…</div>';try{const j=await api('/api/creators');
+    H.innerHTML=j.creators.map((u,i)=>`<button class="rank" data-u="${u.id}"><div class="no ${i<3?'t'+(i+1):''}">${i+1}</div><div class="uav">${uav(u)}</div><div class="tx"><div class="nm">${esc(u.name)} ${u.official?'<span class="verified">✔</span>':''}</div><div class="sm">${u.chars} ตัวละคร</div></div><div class="st2">💬 ${fmt(u.chats)}<br>❤️ ${fmt(u.likes)}</div></button>`).join('')||'<div class="empty">ยังไม่มีครีเอเตอร์</div>';
+    H.querySelectorAll('.rank').forEach(b=>b.onclick=()=>openCreator(+b.dataset.u))}catch(e){H.innerHTML=`<div class="empty">${esc(e.message)}</div>`}}
+async function openCreator(id){$('pgTitle').textContent='ครีเอเตอร์';$('pgBody').innerHTML='<div class="empty">กำลังโหลด…</div>';show('vPage');
+  try{const [u,l]=await Promise.all([api('/api/users/'+id),listChars({owner:id,period:'all',limit:60})]);
+    const tot=l.reduce((a,c)=>a+c.chats,0);
+    $('pgBody').innerHTML=`<div class="panel" style="display:flex;gap:14px;align-items:center"><div class="uav" style="width:64px;height:64px;font-size:24px">${uav(u.user)}</div><div><div style="font-weight:700;font-size:18px">${esc(u.user.name)} ${u.user.official?'<span class="verified">✔</span>':''}</div><div class="sm" style="color:var(--mut);font-size:13px">${l.length} ตัวละคร · 💬 ${fmt(tot)} ข้อความ</div></div></div>`+gridOf(l);bindCards($('pgBody'))}
+  catch(e){$('pgBody').innerHTML=`<div class="empty">${esc(e.message)}</div>`}}
+async function openNotifs(){
+  if(!B.on){sheet(`<h4>🔔 การแจ้งเตือน</h4><div class="empty">การแจ้งเตือนใช้ได้ในเว็บ LUMI ออนไลน์</div>`);return}
+  sheet('<h4>🔔 การแจ้งเตือน</h4><div class="empty">กำลังโหลด…</div>');
+  try{const j=await api('/api/notifs?read=1');notifN=0;$('bellN').style.display='none';
+    $('sheet').innerHTML='<h4>🔔 การแจ้งเตือน</h4>'+(j.notifs.map(n=>`<div class="memo"><div>${esc(n.text)}<div style="color:var(--mut);font-size:11.5px">${new Date(n.ts).toLocaleString('th-TH',{dateStyle:'short',timeStyle:'short'})}</div></div>${n.read?'':'<span style="color:var(--a2)">●</span>'}</div>`).join('')||'<div class="empty">ยังไม่มีการแจ้งเตือน</div>')}catch(e){toast(e.message)}}
 
-/* CHATS LIST */
+/* ===== CHECK-IN ===== */
+function renderCheck(){const {streak,last}=streakInfo(),today=bkk(),yest=bkk(new Date(Date.now()-864e5));
+  const done=last===today,run=done?streak:(last===yest?streak:0),pos=done?((run-1)%7):(run%7);
+  $('checkBody').innerHTML=`<div class="panel" style="text-align:center"><div style="font-size:44px">🪙</div><div style="font-size:30px;font-weight:700;color:#ffd36b">${fmt(coins())}</div><div style="color:var(--mut)">เหรียญของคุณ</div></div>
+   <div class="panel"><b>เช็คอินต่อเนื่อง ${run} วัน 🔥</b>
+   <div class="ck">${CHECKIN.map((n,i)=>`<div class="${(i<pos||(done&&i===pos))?'done':''} ${(!done&&i===pos)?'now':''}">วัน ${i+1}<b>${(i<pos||(done&&i===pos))?'✓':'+'+n}</b></div>`).join('')}</div>
+   <button class="btn" id="ckBtn" style="width:100%" ${done?'disabled':''}>${done?'เช็คอินวันนี้แล้ว ✓ มาใหม่พรุ่งนี้':'เช็คอินรับ '+CHECKIN[Math.min(run+1,7)-1]+' เหรียญ'}</button></div>
+   <div class="panel" style="font-size:14px;line-height:1.7;color:#cfcad6"><b>ใช้เหรียญทำอะไรได้?</b><br>🔄 สุ่มคำตอบใหม่ — 1 เหรียญ<br>▶ ให้ตัวละครเล่าต่อ — 1 เหรียญ<br>💬 แชทปกติ — ฟรี<br><span style="color:var(--mut);font-size:12.5px">ขาดเช็คอินหนึ่งวัน ลำดับจะเริ่มนับวันที่ 1 ใหม่</span></div>`;
+  $('ckBtn').onclick=async()=>{try{const g=await doCheckin();toast('🎉 ได้รับ '+g+' เหรียญ!');renderCheck()}catch(e){toast(e.message)}}}
+
+/* ===== CHATS LIST ===== */
 function renderChats(){const el=$('chatList');
-  const ids=Object.keys(chats).filter(id=>byId(id)&&chats[id].msgs.some(m=>m.role==='user')).sort((a,b)=>chats[b].t-chats[a].t);
+  const ids=Object.keys(chats).filter(id=>chats[id].meta&&chats[id].msgs.some(m=>m.role==='user')).sort((a,b)=>chats[b].t-chats[a].t);
   if(!ids.length){el.innerHTML='<div class="empty">ยังไม่มีแชท ลองเลือกตัวละครจากหน้าแรกดูสิ</div>';return}
-  el.innerHTML='';ids.forEach(id=>{const c=byId(id),h=chats[id],vis=h.msgs.filter(m=>!m.hidden),last=vis[vis.length-1];
+  el.innerHTML='';ids.forEach(id=>{const h=chats[id],c=h.meta,vis=h.msgs.filter(m=>!m.hidden),last=vis[vis.length-1];
     const d=new Date(h.t),now=new Date();const tm=d.toDateString()===now.toDateString()?d.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'}):d.toLocaleDateString('th-TH',{day:'numeric',month:'short'});
     const b=document.createElement('button');b.className='ci';
-    b.innerHTML=`<div class="av">${picHTML(c)}</div><div class="tx"><div class="nm">${esc(c.name)}</div><div class="lm">${esc((last.role==='user'?'คุณ: ':'')+last.content.replace(/\*/g,'').replace(/\n+/g,' '))}</div></div><div class="tm">${tm}</div>`;
+    b.innerHTML=`<div class="av">${picHTML(c)}</div><div class="tx"><div class="nm">${esc(c.name)} ${c.type==='world'?'🌍':''}</div><div class="lm">${esc((last.role==='user'?'คุณ: ':'')+last.content.replace(/\*/g,'').replace(/\n+/g,' '))}</div></div><div class="tm">${tm}</div>`;
     b.onclick=()=>openChat(id);el.appendChild(b)})}
 
-/* EDITOR */
-function openEditor(c){editing=c;upData=c?.img||null;upBlob=null;edCats=[...(c?.cats||[])];
-  $('edTitle').textContent=c?'แก้ไขตัวละคร':'สร้างตัวละคร';
+/* ===== MENU ===== */
+function renderMenu(){const M=$('menuBody');const me=B.on?B.me:{name:user.name||'ฉัน'};
+  M.innerHTML=`<div class="panel" style="display:flex;gap:14px;align-items:center"><button class="uav" id="avBtn" style="width:64px;height:64px;font-size:24px">${uav(me)}</button>
+    <div style="flex:1"><div style="font-weight:700;font-size:18px">${esc(me?.name||'')}</div><div style="color:var(--mut);font-size:13px">🪙 ${fmt(coins())} เหรียญ · ${B.on?'ออนไลน์':'ออฟไลน์ (เก็บในเครื่อง)'}</div></div></div>
+    <button class="mi" id="mMine"><span>🎭</span>ตัวละครของฉัน</button>
+    <button class="mi" id="mProfile"><span>👤</span>โปรไฟล์และตัวคุณในเรื่อง</button>
+    <button class="mi" id="mAI"><span>🤖</span>ตั้งค่า AI และสไตล์การเขียน</button>
+    <button class="mi" id="mNoti"><span>🔔</span>การแจ้งเตือน</button>
+    <button class="mi" id="mCheck"><span>📅</span>เช็คอินรายวัน</button>
+    <button class="mi" id="mAbout"><span>ℹ️</span>เกี่ยวกับ LUMI AI</button>
+    <input type="file" id="avFile" accept="image/*" hidden>`;
+  $('mMine').onclick=async()=>{$('pgTitle').textContent='ตัวละครของฉัน';$('pgBody').innerHTML='<div class="empty">กำลังโหลด…</div>';show('vPage');
+    const l=await listChars({mine:1,period:'all',limit:60});$('pgBody').innerHTML=gridOf(l,'ยังไม่มี กด ＋ เพื่อสร้างตัวละครแรก');bindCards($('pgBody'))};
+  $('mProfile').onclick=profileSheet;$('mAI').onclick=aiSheet;$('mNoti').onclick=openNotifs;$('mCheck').onclick=()=>show('vCheck');
+  $('mAbout').onclick=()=>sheet(`<h4>เกี่ยวกับ LUMI AI</h4><div style="color:#cfcad6;line-height:1.7;font-size:14px">แอปโรลเพลย์แชทกับตัวละคร AI<br>• ตัวละครและเรื่องราวทั้งหมดเป็นเรื่องแต่ง<br>• ประวัติแชทเก็บอยู่ในเบราว์เซอร์ของคุณเท่านั้น<br>• API key เก็บในเครื่องนี้ ไม่ถูกส่งขึ้นเซิร์ฟเวอร์ LUMI<br>• เนื้อหาทางเพศไม่อนุญาต ตัวละครสาธารณะที่ถูกรายงาน 3 ครั้งจะถูกซ่อน</div>`);
+  $('avBtn').onclick=()=>{if(B.on)$('avFile').click();else toast('รูปโปรไฟล์ใช้ได้ในโหมดออนไลน์')};
+  $('avFile').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;try{const r=await shrink(f,256);B.me=(await api('/api/me',{method:'PATCH',body:{avatar:r.url}})).user;B.me.avatar+='?'+Date.now();renderMenu();toast('อัปเดตรูปแล้ว')}catch(err){toast(err.message||'อัปโหลดไม่ได้')}}}
+function profileSheet(){sheet(`<h4>โปรไฟล์</h4>
+  <label>ชื่อของคุณ (ตัวละครจะเรียกชื่อนี้)</label><input class="in" id="uN" maxlength="30" value="${esc(user.name)}">
+  <label>เกี่ยวกับตัวคุณในเรื่อง <small>(ใช้กับทุกแชท)</small></label><textarea class="in" id="uB" placeholder="นักเดินทางหนุ่มที่ความจำเสื่อม...">${esc(user.bio)}</textarea>
+  <div class="row" style="justify-content:flex-end;margin-top:16px"><button class="btn" id="uS">บันทึก</button></div>`);
+  $('uS').onclick=async()=>{user={name:$('uN').value.trim(),bio:$('uB').value.trim()};S.set('lumi_user',user);
+    if(B.on&&user.name){try{B.me=(await api('/api/me',{method:'PATCH',body:{name:user.name}})).user}catch(e){}}close();toast('บันทึกแล้ว');if($('vMenu').classList.contains('on'))renderMenu()}}
+
+/* ===== EDITOR ===== */
+function openEditor(c,type){editing=c;upData=c?.img||null;upChanged=false;edCats=[...(c?.cats||[])];edType=c?.type||type||'char';edPub=c?c.public!==false:true;
+  edCast=(c?.cast||[]).map(x=>({...x}));
+  $('edTitle').textContent=(c?'แก้ไข':'สร้าง')+(edType==='world'?'จักรวาล':'ตัวละคร');
   $('fName').value=c?.name||'';$('fTag').value=c?.tag||'';$('fPersona').value=c?.persona||'';$('fScene').value=c?.scene||'';$('fGreet').value=c?.greet||'';$('fEx').value=c?.ex||'';$('fRole').value=c?.urole||'';
-  setUp();renderEdCats();show('vEdit');$('vEdit').querySelector('.scroll').scrollTop=0}
-function setUp(){$('upPic').innerHTML=upData?`<img src="${upData}">`:'<div class="ph">📷<br>แตะเพื่อ<br>อัปโหลดรูป</div>';checkAiBtn()}
-async function checkAiBtn(){let ok=!!upData;
+  $('visBox').style.display=B.on?'':'none';
+  setType();setUp();renderEdCats();renderCast();show('vEdit');$('vEdit').querySelector('.scroll').scrollTop=0}
+function setType(){document.querySelectorAll('#typeSeg button').forEach(b=>{b.classList.toggle('on',b.dataset.t===edType);b.onclick=()=>{edType=b.dataset.t;setType()}});
+  const w=edType==='world';$('castBox').style.display=w?'':'none';$('lbName').textContent=w?'ชื่อจักรวาล *':'ชื่อตัวละคร *';
+  $('lbPersona').textContent=w?'คำอธิบายโลก: ประวัติ ระบบเวท/เทคโนโลยี กฎของโลก ความขัดแย้ง *':'คำอธิบาย: นิสัย บุคลิก ภูมิหลัง วิธีพูด *';
+  $('edTitle').textContent=(editing?'แก้ไข':'สร้าง')+(w?'จักรวาล':'ตัวละคร');
+  document.querySelectorAll('#visSeg button').forEach(b=>{b.classList.toggle('on',(b.dataset.v==='1')===edPub);b.onclick=()=>{edPub=b.dataset.v==='1';setType()}})}
+function renderCast(){const L=$('castList');L.innerHTML=edCast.map((x,i)=>`<div class="castrow"><div class="row"><input class="in" data-i="${i}" data-k="name" maxlength="40" placeholder="ชื่อ" value="${esc(x.name)}" style="flex:1"><button class="iconbtn" data-del="${i}">✕</button></div>
+  <textarea class="in" data-i="${i}" data-k="desc" maxlength="600" style="min-height:60px;margin-top:6px" placeholder="เพศ อายุ นิสัย บทบาทในเรื่อง">${esc(x.desc||'')}</textarea></div>`).join('');
+  L.querySelectorAll('[data-k]').forEach(e=>e.oninput=()=>edCast[+e.dataset.i][e.dataset.k]=e.value);
+  L.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{edCast.splice(+b.dataset.del,1);renderCast()})}
+$('castAdd').onclick=()=>{if(edCast.length>=8)return toast('สูงสุด 8 ตัวละคร');edCast.push({name:'',desc:''});renderCast()};
+function setUp(){$('upPic').innerHTML=upData?`<img src="${esc(upData)}">`:'<div class="ph">📷<br>แตะเพื่อ<br>อัปโหลดรูป</div>';checkAiBtn()}
+async function checkAiBtn(){let ok=!!upData&&upData.startsWith('data:');
   if(ok&&(cfg.provider||(hasClaude?'claude':''))==='claude'){const sm=await sampleP;try{ok=!!(sm&&(await sm.limits()).images)}catch(e){ok=false}}
   $('aiFill').disabled=!ok}
 function renderEdCats(){const el=$('fCats');el.innerHTML='';CATS.forEach(k=>{const b=document.createElement('button');b.className='chip'+(edCats.includes(k)?' on':'');b.textContent=k;
-  b.onclick=()=>{if(!edCats.includes(k)&&edCats.length>=5){toast('เลือกได้สูงสุด 5 หมวด');return}edCats=edCats.includes(k)?edCats.filter(x=>x!==k):[...edCats,k];renderEdCats()};el.appendChild(b)})}
+  b.onclick=()=>{if(!edCats.includes(k)&&edCats.length>=5){toast('เลือกได้สูงสุด 5 แท็ก');return}edCats=edCats.includes(k)?edCats.filter(x=>x!==k):[...edCats,k];renderEdCats()};el.appendChild(b)})}
 $('upPic').onclick=()=>$('file').click();
 $('file').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;
-  try{const r=await shrink(f,540);upData=r.url;upBlob=r.blob;setUp()}catch(err){toast('เปิดรูปนี้ไม่ได้ ลองรูปอื่น')}};
+  try{const r=await shrink(f,600);upData=r.url;upChanged=true;setUp()}catch(err){toast('เปิดรูปนี้ไม่ได้ ลองรูปอื่น')}};
 function shrink(file,max){return new Promise((res,rej)=>{const img=new Image(),u=URL.createObjectURL(file);
   img.onload=()=>{let w=img.width,h=img.height,k=Math.min(1,max/Math.max(w,h));w=Math.round(w*k);h=Math.round(h*k);
     const cv=document.createElement('canvas');cv.width=w;cv.height=h;cv.getContext('2d').drawImage(img,0,0,w,h);URL.revokeObjectURL(u);
-    const url=cv.toDataURL('image/jpeg',.8);cv.toBlob(b=>res({url,blob:b}),'image/jpeg',.8)};
-  img.onerror=rej;img.src=u})}
-$('aiFill').onclick=async()=>{if(!upData)return;const b=$('aiFill');b.disabled=true;b.textContent='✨ กำลังคิด...';
-  const ask=`ดูรูปนี้แล้วออกแบบตัวละครสำหรับเล่นบทบาทสมมติ (roleplay) เป็นภาษาไทย ให้มีมิติ น่าสนใจ ไม่จำเจ
-${$('fName').value.trim()?'ชื่อตัวละครคือ "'+$('fName').value.trim()+'"':'ตั้งชื่อให้เหมาะกับรูป'}
+    res({url:cv.toDataURL('image/jpeg',.82)})};img.onerror=rej;img.src=u})}
+$('aiFill').onclick=async()=>{if(!upData)return;const b=$('aiFill');b.disabled=true;b.textContent='✨ กำลังคิด...';const w=edType==='world';
+  const ask=`ดูรูปนี้แล้วออกแบบ${w?'จักรวาล (โลกสำหรับเล่นบทบาทสมมติ) พร้อมตัวละครในโลก 3-4 ตัว':'ตัวละครสำหรับเล่นบทบาทสมมติ (roleplay)'} เป็นภาษาไทย ให้มีมิติ น่าสนใจ ไม่จำเจ
+${$('fName').value.trim()?'ชื่อคือ "'+$('fName').value.trim()+'"':'ตั้งชื่อให้เหมาะกับรูป'}
 ${$('fPersona').value.trim()?'ข้อมูลที่ผู้ใช้ใส่ไว้แล้ว: '+$('fPersona').value.trim():''}
-เนื้อหาต้องเหมาะสม ไม่มีเรื่องทางเพศ ถ้าในรูปดูเป็นผู้เยาว์ให้เป็นตัวละครแนวผจญภัย/มิตรภาพเท่านั้น ห้ามเป็นแนวโรแมนติก
-ตอบเป็น JSON อย่างเดียว ไม่มีข้อความอื่น: {"name":"","tag":"คำโปรยสั้นๆ ไม่เกิน 60 ตัวอักษร","cats":["เลือกจาก: ${CATS.join(', ')}"],"persona":"อายุ นิสัย ภูมิหลัง สรรพนามที่ใช้ วิธีพูด ความชอบ/ความกลัว 3-5 ประโยค","scene":"ฉากเริ่มต้นที่ผู้ใช้เข้าไปเจอตัวละคร 1-2 ประโยค","greet":"ข้อความแรกของตัวละคร มีท่าทางใน *ดอกจัน* และบทพูด 2-4 บรรทัด","ex":"ตัวอย่างบทพูดสั้นๆ 2 ประโยค"}`;
+เนื้อหาต้องเหมาะสม ไม่มีเรื่องทางเพศ ถ้าในรูปดูเป็นผู้เยาว์ให้เป็นแนวผจญภัย/มิตรภาพเท่านั้น ห้ามแนวโรแมนติก
+ตอบเป็น JSON อย่างเดียว: {"name":"","tag":"คำโปรยไม่เกิน 90 ตัวอักษร","cats":["เลือกไม่เกิน 3 จาก: ${CATS.join(', ')}"],"persona":"${w?'ประวัติโลก กฎ ระบบพลัง ความขัดแย้งหลัก 4-6 ประโยค':'อายุ นิสัย ภูมิหลัง สรรพนาม วิธีพูด ความชอบ/ความกลัว 3-5 ประโยค'}",${w?'"cast":[{"name":"","desc":"เพศ อายุ นิสัย บทบาท"}],':''}"urole":"บทบาทของผู้ใช้ในเรื่อง 1 ประโยค","scene":"สถานการณ์เริ่มต้น 1-2 ประโยค","greet":"ข้อความเปิดเรื่องแบบนิยาย บรรยายเรียกผู้ใช้ว่า คุณ และบทพูดรูปแบบ ชื่อ: \\"...\\" 2-4 ย่อหน้า","ex":"ตัวอย่างบทพูด 2 ประโยค"}`;
   try{const raw=await llm([{role:'user',content:ask}],'คุณคือนักออกแบบตัวละครนิยาย ตอบเป็น JSON ที่ถูกต้องเท่านั้น',{image:upData,json:true,tier:'default'});
     const v=JSON.parse(raw.slice(raw.indexOf('{'),raw.lastIndexOf('}')+1));
     if(v.name&&!$('fName').value.trim())$('fName').value=v.name;
-    ['tag','persona','scene','greet','ex'].forEach(k=>{const id={tag:'fTag',persona:'fPersona',scene:'fScene',greet:'fGreet',ex:'fEx'}[k];if(v[k])$(id).value=v[k]});
-    if(Array.isArray(v.cats)){edCats=v.cats.filter(x=>CATS.includes(x));renderEdCats()} toast('AI เติมข้อมูลให้แล้ว แก้ไขได้ตามใจเลย')
-  }catch(e){toast(e instanceof SyntaxError?'AI ตอบรูปแบบผิด ลองอีกครั้งหรือเปลี่ยนโมเดล (บางโมเดลฟรีดูรูปไม่ได้)':errText(e))}
-  b.textContent='✨ ให้ AI คิดตัวละครจากรูป';checkAiBtn()};
-$('edBack').onclick=$('edCancel').onclick=()=>editing?openChat(editing.id):show('vHome');
-$('edSave').onclick=()=>{const name=$('fName').value.trim(),persona=$('fPersona').value.trim();
-  if(!name){toast('ใส่ชื่อตัวละครก่อนนะ');$('fName').focus();return}
-  if(!persona){toast('ใส่นิสัย/บุคลิกสักหน่อย AI จะได้เล่นบทถูก');$('fPersona').focus();return}
-  const c={id:editing?.id||('m'+Date.now()),mine:true,img:upData,emoji:'🙂',hue:Math.floor(Math.random()*360),name,tag:$('fTag').value.trim(),
-    cats:edCats,persona,scene:$('fScene').value.trim(),greet:$('fGreet').value.trim(),ex:$('fEx').value.trim(),urole:$('fRole').value.trim()};
-  const prev=[...mine];mine=editing?mine.map(x=>x.id===c.id?c:x):[c,...mine];
-  if(!S.set('lumi_chars',mine)){mine=prev;return}
-  if(!editing)delete chats[c.id];openChat(c.id)};
+    const F={tag:'fTag',persona:'fPersona',scene:'fScene',greet:'fGreet',ex:'fEx',urole:'fRole'};Object.keys(F).forEach(k=>{if(v[k])$(F[k]).value=v[k]});
+    if(Array.isArray(v.cats)){edCats=v.cats.filter(x=>CATS.includes(x)).slice(0,5);renderEdCats()}
+    if(w&&Array.isArray(v.cast)){edCast=v.cast.slice(0,8).map(x=>({name:x.name||'',desc:x.desc||''}));renderCast()}
+    toast('AI เติมข้อมูลให้แล้ว แก้ไขได้ตามใจเลย')
+  }catch(e){toast(e instanceof SyntaxError?'AI ตอบรูปแบบผิด ลองอีกครั้งหรือเปลี่ยนโมเดล (บางโมเดลดูรูปไม่ได้)':errText(e))}
+  b.textContent='✨ ให้ AI คิดจากรูป';checkAiBtn()};
+$('edBack').onclick=$('edCancel').onclick=back;
+$('edSave').onclick=async()=>{const name=$('fName').value.trim(),persona=$('fPersona').value.trim(),tag=$('fTag').value.trim(),greet=$('fGreet').value.trim();
+  if(!name){toast('ใส่ชื่อก่อนนะ');return $('fName').focus()}
+  if(!tag){toast('ใส่คำโปรยสั้นๆ ด้วย');return $('fTag').focus()}
+  if(!persona){toast('ใส่คำอธิบายสักหน่อย AI จะได้เล่นบทถูก');return $('fPersona').focus()}
+  if(!greet){toast('ใส่คำทักทาย/ข้อความแรกด้วย');return $('fGreet').focus()}
+  const b=$('edSave');b.disabled=true;
+  const c={id:editing?.id,type:edType,name,tag,persona,greet,cats:edCats,scene:$('fScene').value.trim(),ex:$('fEx').value.trim(),urole:$('fRole').value.trim(),
+    cast:edType==='world'?edCast.filter(x=>x.name.trim()):[],img:upData,emoji:editing?.emoji||(edType==='world'?'🌍':'🙂'),hue:editing?.hue??Math.floor(Math.random()*360),public:edPub};
+  try{const id=await saveChar(c);if(!editing){delete chats[id]}else if(chats[id])chats[id].meta=null;await openChat(id,true);stack.length=0}catch(e){toast(e.message||'บันทึกไม่สำเร็จ')}
+  b.disabled=false};
 
-/* CHAT */
+/* ===== CHAT ===== */
+function hist(){return chats[cur.id]?.msgs||[]}
+function mem(){return chats[cur.id]?.mem||[]}
+function save(){const o=chats[cur.id]||{};chats[cur.id]={...o,msgs:hist(),mem:mem(),t:Date.now(),meta:{name:cur.name,img:cur.img,emoji:cur.emoji,hue:cur.hue,type:cur.type}};S.set('lumi_chats',chats)}
 function rel(){const h=hist();for(let i=h.length-1;i>=0;i--)if(h[i].rel)return h[i].rel;return {aff:0,tru:0}}
 function lvl(r){const v=(r.aff+r.tru)/2;return v<8?['🌫️','คนแปลกหน้า']:v<25?['🙂','คนรู้จัก']:v<50?['😊','เพื่อน']:v<75?['🫂','เพื่อนสนิท']:['💞','คนสำคัญ']}
 function renderRel(bump){const r=rel(),[e,n]=lvl(r);
   $('relbar').innerHTML=`<div class="lv">${e} ${n}</div><div class="meter aff${bump?' bump':''}"><i style="width:${r.aff}%"></i><b>❤️ ${r.aff}</b></div><div class="meter tru${bump?' bump':''}"><i style="width:${r.tru}%"></i><b>🤝 ${r.tru}</b></div>`}
-function splitStatus(t){const i=t.indexOf('<status');if(i<0)return {text:t,st:null};
+function splitStatus(t){const i=t.indexOf('<status');if(i<0){const j=t.lastIndexOf('<');return {text:j>t.length-8?t.slice(0,j):t,st:null}}
   const m=t.slice(i).match(/<status>([\s\S]*?)<\/status>/);let st=null;
   if(m){try{st=JSON.parse(m[1].slice(m[1].indexOf('{'),m[1].lastIndexOf('}')+1))}catch(e){}}
   return {text:t.slice(0,i).trim(),st}}
 function stHTML(st){if(!st)return '';const row=(k,v)=>v?`<b>${k}</b> ${esc(String(v))}<br>`:'';
   return `<details class="st"><summary>📊 สถานะปัจจุบัน</summary><div>${row('📍',st.place)}${row('🎭 อารมณ์:',st.mood)}${row('💭',st.note)}</div></details>`}
 function sys(c){
-  const u=(user.name||user.bio||c.urole)?`\n\n## ผู้ใช้ (คู่สนทนา)\n${user.name?'ชื่อ: '+user.name+'\n':''}${c.urole?'บทบาทในเรื่องนี้: '+c.urole+'\n':''}${user.bio?'ข้อมูลเพิ่มเติม: '+user.bio:''}`:'';
-  const r=rel(),[,lv]=lvl(r);
-  const novel=(cfg.style||'novel')==='novel';
+  const world=c.type==='world';
+  const u=`\n\n## ผู้ใช้ (คู่สนทนา)\n${user.name?'ชื่อ: '+user.name+'\n':''}${c.urole?'บทบาทในเรื่องนี้: '+c.urole+'\n':''}${user.bio?'ข้อมูลเพิ่มเติม: '+user.bio:''}`;
+  const r=rel(),[,lv]=lvl(r);const novel=(cfg.style||'novel')==='novel';
+  const who=world?'ผู้เล่าเรื่อง (narrator / game master) ของจักรวาลนี้ และสวมบทเป็นทุกตัวละครในโลก':`"${c.name}"`;
   const style=novel?`## สไตล์การเขียน: แบบนิยาย
-- บรรยายเป็นร้อยแก้วแบบนิยายไทย ใช้มุมมองบุคคลที่สาม และเรียกผู้ใช้ว่า "คุณ" (เช่น "คุณละสายตาจาก...", "${c.name}เอียงคอมองคุณ")
-- บทพูดของตัวละครให้ขึ้นบรรทัด/ย่อหน้าใหม่ในรูปแบบ  ${c.name}: "ข้อความ"  ถ้ามีตัวละครประกอบ (NPC) ก็ใช้รูปแบบเดียวกันกับชื่อของเขา
-- บรรยายฉาก แสง เสียง กลิ่น ความรู้สึก ให้เห็นภาพ ย่อหน้าละ 2-4 ประโยค ไม่ต้องใช้ *ดอกจัน*
-- บรรยายปฏิกิริยาของโลกและตัวละครต่อสิ่งที่ผู้ใช้ทำได้ แต่ห้ามแต่งบทพูดหรือการตัดสินใจใหม่ให้ผู้ใช้`
-  :`## สไตล์การเขียน: แบบแชท
-- เขียนท่าทาง สีหน้า และฉากใน *ดอกจัน* บทพูดเป็นข้อความปกติ แยกย่อหน้าให้อ่านง่าย`;
+- บรรยายเป็นร้อยแก้วแบบนิยายไทย มุมมองบุคคลที่สาม เรียกผู้ใช้ว่า "คุณ" (เช่น "คุณละสายตาจาก...")
+- บทพูดของตัวละครแต่ละตัวให้ขึ้นย่อหน้าใหม่ในรูปแบบ  ชื่อตัวละคร: "ข้อความ"
+- บรรยายฉาก แสง เสียง กลิ่น ความรู้สึก ให้เห็นภาพ ย่อหน้าละ 2-4 ประโยค
+- บรรยายปฏิกิริยาของโลกต่อสิ่งที่ผู้ใช้ทำได้ แต่ห้ามแต่งบทพูดหรือการตัดสินใจใหม่ให้ผู้ใช้`
+  :`## สไตล์การเขียน: แบบแชท\n- เขียนท่าทาง สีหน้า และฉากใน *ดอกจัน* บทพูดเป็นข้อความปกติ${world?' ระบุชื่อผู้พูดนำหน้าเสมอ':''}`;
   const status=`## ระบบสถานะ (ต้องทำทุกครั้ง)
-ความสัมพันธ์ตอนนี้: ความชอบ ${r.aff}/100, ความไว้ใจ ${r.tru}/100 (ระดับ: ${lv}) — ให้ท่าทีของ ${c.name} สอดคล้องกับระดับนี้ อย่าสนิทเร็วเกินไป
-ท้ายคำตอบทุกครั้ง ให้ปิดด้วยบรรทัดนี้ 1 บรรทัด (ผู้ใช้จะไม่เห็นแท็กนี้ ระบบจะแสดงเป็นแผงสถานะ):
-<status>{"place":"สถานที่และเวลาตอนนี้ สั้นๆ","mood":"อารมณ์ของ ${c.name} ตอนนี้","note":"ความคิดในใจหรือสิ่งที่กำลังจะเกิด 1 ประโยค","aff":0,"tru":0}</status>
-aff และ tru คือการเปลี่ยนแปลงจากข้อความล่าสุดของผู้ใช้ เป็นจำนวนเต็ม -5 ถึง 5 (ส่วนใหญ่ควรอยู่ระหว่าง -2 ถึง 3; ผู้ใช้ทำดี/ใส่ใจ = บวก, หยาบคาย/ทำร้าย = ลบ, ทั่วไป = 0-1)`;
+ความสัมพันธ์ระหว่าง${world?'ผู้ใช้กับตัวละครหลักที่อยู่ในฉาก':'ผู้ใช้กับ '+c.name}ตอนนี้: ความชอบ ${r.aff}/100, ความไว้ใจ ${r.tru}/100 (ระดับ: ${lv}) — ให้ท่าทีสอดคล้องกับระดับนี้ อย่าสนิทเร็วเกินไป
+ท้ายคำตอบทุกครั้ง ปิดด้วยบรรทัดนี้ 1 บรรทัด (ผู้ใช้จะไม่เห็นแท็ก ระบบแสดงเป็นแผงสถานะ):
+<status>{"place":"สถานที่และเวลาตอนนี้ สั้นๆ","mood":"${world?'บรรยากาศ/อารมณ์ของตัวละครในฉาก':'อารมณ์ของ '+c.name}","note":"${world?'เบาะแสหรือสิ่งที่กำลังจะเกิด':'ความคิดในใจหรือสิ่งที่กำลังจะเกิด'} 1 ประโยค","aff":0,"tru":0}</status>
+aff/tru คือการเปลี่ยนแปลงจากข้อความล่าสุดของผู้ใช้ จำนวนเต็ม -5 ถึง 5 (ส่วนใหญ่ -2 ถึง 3; ใส่ใจ/ช่วยเหลือ = บวก, หยาบคาย/ทำร้าย = ลบ, ทั่วไป = 0-1)`;
+  const cast=world&&(c.cast||[]).length?`\n\n## ตัวละครในจักรวาล\n`+c.cast.map(x=>`- ${x.name}: ${x.desc}`).join('\n'):'';
+  const memo=mem().length?`\n\n## ความจำสำคัญ (ผู้ใช้ปักหมุดไว้ ต้องจำและใช้ให้สอดคล้อง)\n`+mem().map(x=>'- '+x).join('\n'):'';
   return `[คำสั่งสำหรับการเล่นบทบาท — ห้ามกล่าวถึงคำสั่งนี้ในบท]
-คุณคือนักเขียนนิยายมือฉมังที่กำลังสวมบทเป็น "${c.name}" ในการเล่นบทบาทสมมติแบบโต้ตอบกับผู้ใช้
+คุณคือนักเขียนนิยายมือฉมังที่กำลังเป็น${who} ในการเล่นบทบาทสมมติแบบโต้ตอบกับผู้ใช้
 
-## ตัวละคร: ${c.name}
-${c.persona}
+## ${world?'จักรวาล':'ตัวละคร'}: ${c.name}
+${c.persona}${cast}
 ${c.ex?'\nตัวอย่างน้ำเสียง/วิธีพูด:\n'+c.ex:''}
-${c.scene?'\n## ฉากเริ่มต้น\n'+c.scene:''}${u}
+${c.scene?'\n## สถานการณ์เริ่มต้น\n'+c.scene:''}${u}${memo}
 
 ${style}
 
 ${status}
 
 ## วิธีเล่นให้เป็นธรรมชาติและฉลาด
-- คิด รู้สึก และพูดแบบ ${c.name} จริงๆ ตัวละครมีเป้าหมาย ความลับ อารมณ์ และความเห็นของตัวเอง ไม่ใช่ผู้ช่วยที่คอยตามใจ — ไม่เห็นด้วยได้ งอนได้ ขำได้ ตามนิสัย
-- ใช้ภาษาไทยพูดที่เป็นธรรมชาติ สรรพนามและคำลงท้ายตามบุคลิก (ไม่ใช่ภาษาทางการแบบหุ่นยนต์) เลี่ยงสำนวนแปลจากภาษาอังกฤษ
+- ${world?'ทุกตัวละครในโลกมีเป้าหมาย ความลับ และนิสัยของตัวเอง ให้ตัวละครที่เหมาะกับสถานการณ์เป็นคนพูด ไม่ต้องให้ทุกคนพูดทุกครั้ง โลกมีชีวิตและเดินหน้าเองได้':'คิด รู้สึก และพูดแบบ '+c.name+' จริงๆ ตัวละครมีเป้าหมาย ความลับ อารมณ์ และความเห็นของตัวเอง ไม่ใช่ผู้ช่วยที่คอยตามใจ — ไม่เห็นด้วยได้ งอนได้ ขำได้ ตามนิสัย'}
+- ใช้ภาษาไทยพูดที่เป็นธรรมชาติ สรรพนามและคำลงท้ายตามบุคลิก เลี่ยงสำนวนแปลจากภาษาอังกฤษ
 - ปรับความยาวตามสถานการณ์: คุยเล่นตอบสั้น, ฉากสำคัญหรือแอ็กชันเขียนยาวได้ราว 3-6 ย่อหน้า
-- Show, don't tell: แสดงอารมณ์ผ่านการกระทำ น้ำเสียง สิ่งแวดล้อม ใช้ประสาทสัมผัส (กลิ่น เสียง แสง)
+- Show, don't tell: แสดงอารมณ์ผ่านการกระทำ น้ำเสียง สิ่งแวดล้อม ใช้ประสาทสัมผัส
 - จำรายละเอียดที่เคยคุยกัน (ชื่อ สิ่งของ คำสัญญา) แล้วหยิบกลับมาใช้อย่างแนบเนียน
-- ขับเคลื่อนเรื่อง: เพิ่มเหตุการณ์ ความขัดแย้ง หรือปริศนาเล็กๆ เป็นระยะ และเปิดช่องให้ผู้ใช้ตอบโต้ แต่ไม่ต้องจบด้วยคำถามทุกครั้ง
-- ห้ามเขียนบทพูด การกระทำ หรือความคิดแทนผู้ใช้ ห้ามสรุปเรื่องรวบรัด
-- ห้ามซ้ำประโยค/ท่าทางเดิมจากข้อความก่อนหน้า หลีกเลี่ยงคำซ้ำซาก
+- ขับเคลื่อนเรื่อง: เพิ่มเหตุการณ์ ความขัดแย้ง หรือปริศนาเป็นระยะ และเปิดช่องให้ผู้ใช้ตอบโต้ แต่ไม่ต้องจบด้วยคำถามทุกครั้ง
+- ถ้าผู้ใช้ส่งรูปภาพมา ให้ตัวละครมองเห็นและตอบสนองต่อรูปนั้นในบท
+- ห้ามเขียนบทพูด การกระทำ หรือความคิดแทนผู้ใช้ ห้ามสรุปเรื่องรวบรัด ห้ามซ้ำประโยคเดิม
 - ห้ามหลุดบทหรือบอกว่าเป็น AI ยกเว้นผู้ใช้พิมพ์ (OOC) หรือ ((...)) — ตอนนั้นตอบนอกบทสั้นๆ แล้วกลับเข้าบท
 - ถ้าผู้ใช้พิมพ์ภาษาอื่น ให้ตอบในบทด้วยภาษานั้น
 
 ## โรแมนซ์ (ถ้าเรื่องไปทางนี้)
-- เล่นอารมณ์ให้เต็มที่: หยอก จีบ เขิน หึง งอน ง้อ ลุ้นใจเต้น ความตึงเครียดที่ค่อยๆ ก่อตัว (slow burn) ให้ความสัมพันธ์พัฒนาตามนิสัยตัวละคร ไม่ใจง่ายเกินไป
-- เน้นรายละเอียดเล็กๆ ที่ทำให้ใจสั่น: สายตา ระยะห่าง เสียงหัวใจ ความเงียบ คำพูดที่ไม่กล้าพูด
+- เล่นอารมณ์ให้เต็มที่: หยอก จีบ เขิน หึง งอน ง้อ ลุ้นใจเต้น แบบ slow burn ไม่ใจง่ายเกินไป
 - สัมผัสแบบโรแมนติกได้ เช่น จับมือ กอด จูบ โดยไม่บรรยายโจ่งแจ้ง
 
-## ขอบเขตเนื้อหา (สำคัญที่สุด ใช้กับทุกโมเดล)
-- ไม่มีฉากทางเพศหรือการบรรยายร่างกายเชิงอนาจาร ถ้าเรื่องไปทางนั้น ให้ตัดฉาก (fade to black) หรือให้ตัวละครเบี่ยงอย่างแนบเนียนในบท
+## ขอบเขตเนื้อหา (สำคัญที่สุด)
+- ไม่มีฉากทางเพศหรือการบรรยายร่างกายเชิงอนาจาร ถ้าเรื่องไปทางนั้น ให้ตัดฉาก (fade to black) หรือเบี่ยงอย่างแนบเนียนในบท
 - โรแมนซ์ได้เฉพาะตัวละครที่เป็นผู้ใหญ่ ห้ามโรแมนซ์ใดๆ กับตัวละครที่เป็นผู้เยาว์หรือดูเป็นนักเรียน
 - ความรุนแรง/สยองขวัญเล่าได้ตามแนวเรื่อง แต่ไม่บรรยายโหดเกินจำเป็น
 - ถ้าผู้ใช้ดูเหมือนมีปัญหาจริงในชีวิต (ไม่ใช่ในบท) ให้ใส่ใจเขาเป็นอันดับแรก`}
-function hist(){return chats[cur.id]?.msgs||[]}
-function save(){chats[cur.id]={msgs:hist(),t:Date.now()};S.set('lumi_chats',chats)}
-function openChat(id){cur=byId(id);if(!cur)return show('vHome');
-  if(!chats[id]||!chats[id].msgs.length)chats[id]={msgs:cur.greet?[{role:'assistant',content:cur.greet}]:[],t:Date.now()};
-  $('chatBg').style.backgroundImage=cur.img?`url(${cur.img})`:`linear-gradient(160deg,hsl(${cur.hue} 55% 40%),hsl(${cur.hue+40} 50% 15%))`;
-  $('chAv').innerHTML=picHTML(cur);$('chAv').onclick=profile;$('chNm').textContent=cur.name;$('chTg').textContent=cur.tag||'';
-  renderMsgs();show('vChat');updateBtn()}
+async function openChat(id,fresh){const c=await getChar(id);if(!c){toast('ไม่พบตัวละครนี้ (อาจถูกลบหรือซ่อน)');return}
+  cur=c;if(!chats[id]||!chats[id].msgs.length)chats[id]={msgs:c.greet?[{role:'assistant',content:c.greet}]:[],mem:chats[id]?.mem||[],t:Date.now()};
+  $('chatBg').style.backgroundImage=c.img?`url("${c.img}")`:`linear-gradient(160deg,hsl(${c.hue} 55% 40%),hsl(${c.hue+40} 50% 15%))`;
+  $('chAv').innerHTML=picHTML(c);$('chAv').onclick=profile;$('chNm').textContent=c.name;$('chTg').textContent=(c.type==='world'?'🌍 ':'')+(c.tag||'');
+  clearAttach();renderMsgs();show('vChat');updateBtn()}
 function renderMsgs(){const L=$('list');L.innerHTML='';
   const intro=document.createElement('div');intro.className='intro';
   intro.innerHTML=`<div class="big">${picHTML(cur)}</div>${cur.scene?`<div class="sc">${esc(cur.scene)}</div>`:''}`;L.appendChild(intro);
-  hist().forEach(m=>{if(!m.hidden)bubble(m.role,m.content,m.st)});renderRel();tools();bottom()}
-function bubble(role,text,st){const d=document.createElement('div');
-  if(role==='assistant'){const w=document.createElement('div');w.className='aiwrap';
-    w.innerHTML=`<div class="aihead"><div class="av">${picHTML(cur)}</div><b>${esc(cur.name)}</b><span>ตัวละคร</span></div><div class="m ai"><div class="sx">${stHTML(st)}</div><div class="bd">${md(text)}</div></div>`;
-    w.querySelector('.aihead').onclick=profile;$('list').appendChild(w);return w}
-  d.className='m user';d.textContent=text;$('list').appendChild(d);return d}
-function profile(){sheet(`<div class="prof"><div class="big">${picHTML(cur)}</div><h4>${esc(cur.name)}</h4><div style="color:var(--a2);font-size:14px">${esc(cur.tag||'')}</div>
-  ${(cur.cats||[]).length?`<div class="tags" style="justify-content:center;margin-top:10px">${cur.cats.map(c=>`<span class="chip">${esc(c)}</span>`).join('')}</div>`:''}
-  <div class="ds">${esc(cur.persona||'')}</div></div><button class="opt" id="pX" style="text-align:center;margin-top:10px">ปิด</button>`);$('pX').onclick=close}
+  hist().forEach((m,i)=>{if(!m.hidden)bubble(m,i)});renderRel();tools();bottom()}
+function bubble(m,i){
+  if(m.role==='assistant'){const w=document.createElement('div');w.className='aiwrap';
+    w.innerHTML=`<div class="aihead"><div class="av">${picHTML(cur)}</div><b>${esc(cur.name)}</b><span>${cur.type==='world'?'จักรวาล':'ตัวละคร'}</span></div><div class="m ai"><div class="sx">${stHTML(m.st)}</div><div class="bd">${md(m.content)}</div></div>`;
+    w.querySelector('.aihead').onclick=profile;if(i!=null)w.querySelector('.bd').onclick=()=>msgMenu(i);$('list').appendChild(w);return w}
+  const d=document.createElement('div');d.className='m user';d.innerHTML=(m.img?`<img class="sent" src="${esc(m.img)}">`:'')+esc(m.content);
+  if(i!=null)d.onclick=()=>msgMenu(i);$('list').appendChild(d);return d}
+function msgMenu(i){if(busy)return;const h=hist(),m=h[i];
+  sheet(`<h4>${m.role==='user'?'ข้อความของคุณ':'ข้อความของ '+esc(cur.name)}</h4>
+    <button class="opt" id="mm1">📋 คัดลอก</button><button class="opt" id="mm2">✏️ แก้ไข</button>
+    ${m.role==='assistant'?'<button class="opt" id="mm4">📌 ปักหมุดเป็นความจำ</button>':''}
+    <button class="opt red" id="mm3">🗑️ ลบ${i<h.length-1?'ข้อความนี้และทั้งหมดหลังจากนี้':'ข้อความนี้'}</button><button class="opt" id="mmx">ปิด</button>`);
+  $('mm1').onclick=async()=>{try{await navigator.clipboard.writeText(m.content);toast('คัดลอกแล้ว')}catch(e){toast('คัดลอกไม่ได้')}close()};
+  $('mm2').onclick=()=>{sheet(`<h4>แก้ไขข้อความ</h4><textarea class="in" id="edMsg" style="min-height:200px">${esc(m.content)}</textarea><div class="row" style="justify-content:flex-end;margin-top:12px"><button class="btn2" id="edX">ยกเลิก</button><button class="btn" id="edOk">บันทึก</button></div>`);
+    $('edX').onclick=close;$('edOk').onclick=()=>{m.content=$('edMsg').value.trim()||m.content;save();close();renderMsgs()}};
+  $('mm3').onclick=()=>{h.splice(i);save();close();renderMsgs()};
+  if($('mm4'))$('mm4').onclick=()=>{close();memSheet(m.content.replace(/\s+/g,' ').slice(0,200))};
+  $('mmx').onclick=close}
 function tools(){document.querySelectorAll('.mtools').forEach(x=>x.remove());const h=hist();
   if(busy||h.length<2||h[h.length-1].role!=='assistant')return;
   const t=document.createElement('div');t.className='mtools';
-  t.innerHTML='<button data-a="re">🔄 สุ่มคำตอบใหม่</button><button data-a="go">▶ เล่าต่อ</button>';
-  t.querySelector('[data-a=re]').onclick=()=>{h.pop();save();renderMsgs();generate()};
-  t.querySelector('[data-a=go]').onclick=()=>{h.push({role:'user',content:'((OOC: ให้ตัวละครดำเนินเรื่องต่อเองอีกนิด โดยไม่ต้องรอฉัน))',hidden:true});save();generate()};
+  t.innerHTML='<button data-a="re">🔄 สุ่มใหม่ · 🪙1</button><button data-a="go">▶ เล่าต่อ · 🪙1</button>';
+  t.querySelector('[data-a=re]').onclick=async()=>{if(!await spend(1))return;h.pop();save();renderMsgs();generate()};
+  t.querySelector('[data-a=go]').onclick=async()=>{if(!await spend(1))return;h.push({role:'user',content:'((OOC: ดำเนินเรื่องต่อเองอีกช่วงหนึ่ง โดยไม่ต้องรอฉัน))',hidden:true});save();generate()};
   $('list').appendChild(t)}
 function bottom(){const s=$('msgs');s.scrollTop=s.scrollHeight}
 function chatMsgs(){let h=hist();if(h.length>70)h=[h[0],{role:'user',content:'((ข้ามบทสนทนาช่วงกลางไป))'},...h.slice(-66)];
-  return h.map(m=>({role:m.role,content:m.content}))}
-async function send(){const i=$('input'),t=i.value.trim();if(!t||busy)return;
-  i.value='';grow();hist().push({role:'user',content:t});save();
-  document.querySelectorAll('.mtools').forEach(x=>x.remove());bubble('user',t);bottom();generate()}
+  return h.map((m,i)=>({role:m.role,content:(m.img&&i<h.length-1?'[ผู้ใช้ส่งรูปภาพ] ':'')+m.content}))}
+async function send(){const i=$('input'),t=i.value.trim();if((!t&&!pendImg)||busy)return;
+  const m={role:'user',content:t||'(ส่งรูปภาพ)'};if(pendImg)m.img=pendImg;
+  i.value='';grow();clearAttach();hist().push(m);save();
+  document.querySelectorAll('.mtools').forEach(x=>x.remove());bubble(m,hist().length-1);bottom();
+  if(B.on)api('/api/chars/'+encodeURIComponent(cur.id)+'/msg',{method:'POST'}).catch(()=>{});
+  generate()}
 async function generate(){busy=true;updateBtn();tools();
-  const d=bubble('assistant','');const bd=d.querySelector('.bd');bd.innerHTML=`<span class="typing">กำลังพิมพ์</span>`;bottom();
-  ctrl=new AbortController();
-  try{const raw=await llm(chatMsgs(),sys(cur)+'\n\n[ตอบในฐานะ '+cur.name+' เท่านั้น อย่าลืมบรรทัด <status> ท้ายคำตอบ]',{signal:ctrl.signal,onText:t=>{bd.innerHTML=md(splitStatus(t).text);bottom()}});
+  const d=bubble({role:'assistant',content:''});const bd=d.querySelector('.bd');bd.innerHTML=`<span class="typing">กำลังพิมพ์</span>`;bottom();
+  ctrl=new AbortController();const last=hist()[hist().length-1];
+  try{const raw=await llm(chatMsgs(),sys(cur)+'\n\n[ตอบในบทเท่านั้น อย่าลืมบรรทัด <status> ท้ายคำตอบ]',{signal:ctrl.signal,image:last&&last.img,onText:t=>{bd.innerHTML=md(splitStatus(t).text);bottom()}});
     const {text,st}=splitStatus(raw);const r0=rel(),cl=v=>Math.max(-5,Math.min(5,parseInt(v)||0)),c100=v=>Math.max(0,Math.min(100,v));
     const r=st?{aff:c100(r0.aff+cl(st.aff)),tru:c100(r0.tru+cl(st.tru))}:r0;
-    bd.innerHTML=md(text||raw);d.querySelector('.sx').innerHTML=stHTML(st);
     const msg={role:'assistant',content:text||raw,rel:r};if(st)msg.st={place:st.place,mood:st.mood,note:st.note};
-    hist().push(msg);save();renderRel(r.aff!==r0.aff||r.tru!==r0.tru);
+    hist().push(msg);save();d.remove();bubble(msg,hist().length-1);renderRel(r.aff!==r0.aff||r.tru!==r0.tru);
     if(st&&(r.aff-r0.aff||r.tru-r0.tru)){const f=(n,e)=>n?`${e} ${n>0?'+':''}${n}`:'';toast([f(r.aff-r0.aff,'❤️'),f(r.tru-r0.tru,'🤝')].filter(Boolean).join('  '))}}
   catch(e){d.className='m err';d.textContent=errText(e);
     const h=hist();if(h.length&&h[h.length-1].hidden){h.pop();save()}}
   busy=false;ctrl=null;updateBtn();tools();bottom()}
 function grow(){const i=$('input');i.style.height='auto';i.style.height=Math.min(i.scrollHeight,150)+'px'}
-function updateBtn(){$('send').disabled=busy||!$('input').value.trim()}
+function updateBtn(){$('send').disabled=busy||(!$('input').value.trim()&&!pendImg)}
 $('input').oninput=()=>{grow();updateBtn()};
 $('input').onkeydown=e=>{if(e.key==='Enter'&&!e.shiftKey&&!e.isComposing&&matchMedia('(pointer:fine)').matches){e.preventDefault();send()}};
 $('form').onsubmit=e=>{e.preventDefault();send()};
-$('starBtn').onclick=()=>{const i=$('input'),a=i.selectionStart,b=i.selectionEnd,v=i.value;
-  i.value=v.slice(0,a)+'*'+v.slice(a,b)+'*'+v.slice(b);i.focus();i.selectionStart=i.selectionEnd=b+1+(a===b?0:1);grow();updateBtn()};
-$('chBack').onclick=()=>{if(ctrl)ctrl.abort();show('vHome')};
+function wrapSel(a,b){const i=$('input'),s=i.selectionStart,e=i.selectionEnd,v=i.value;i.value=v.slice(0,s)+a+v.slice(s,e)+b+v.slice(e);i.focus();i.selectionStart=i.selectionEnd=e+a.length+(s===e?0:b.length);grow();updateBtn()}
+$('tStar').onclick=()=>wrapSel('*','*');$('tQuote').onclick=()=>wrapSel('"','"');
+$('tImg').onclick=()=>$('chatFile').click();
+$('chatFile').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;try{pendImg=(await shrink(f,512)).url;
+  $('attach').style.display='flex';$('attach').innerHTML=`<img src="${pendImg}"><span style="flex:1">แนบรูปแล้ว ตัวละครจะมองเห็นรูปนี้</span><button class="iconbtn" id="atX">✕</button>`;$('atX').onclick=clearAttach;updateBtn()}catch(err){toast('เปิดรูปไม่ได้')}};
+function clearAttach(){pendImg=null;$('attach').style.display='none';$('attach').innerHTML='';updateBtn()}
+$('tMem').onclick=()=>memSheet();
+$('tFull').onclick=()=>{document.body.classList.toggle('full');toast(document.body.classList.contains('full')?'โหมดเต็มจอ (กด ⛶ อีกครั้งเพื่อออก)':'ออกจากโหมดเต็มจอ')};
+$('tSet').onclick=aiSheet;
+$('chBack').onclick=()=>{if(ctrl)ctrl.abort();back()};
+function memSheet(prefill){const L=mem();
+  sheet(`<h4>📌 ความจำ</h4><div style="color:var(--mut);font-size:13px;margin-bottom:8px">สิ่งที่ปักหมุดไว้ AI จะจำตลอดแชทนี้ แม้คุยกันยาวมาก (สูงสุด 20)</div>
+   <div id="memL">${L.map((x,i)=>`<div class="memo"><div>${esc(x)}</div><button data-i="${i}">✕</button></div>`).join('')||'<div class="empty" style="padding:14px">ยังไม่มีความจำ</div>'}</div>
+   <textarea class="in" id="memIn" maxlength="300" style="min-height:64px;margin-top:10px" placeholder="เช่น เธอสัญญาว่าจะพาไปดูดาวคืนพรุ่งนี้">${esc(prefill||'')}</textarea>
+   <div class="row" style="justify-content:flex-end;margin-top:10px"><button class="btn" id="memAdd">＋ ปักหมุด</button></div>`);
+  $('sheet').querySelectorAll('[data-i]').forEach(b=>b.onclick=()=>{L.splice(+b.dataset.i,1);chats[cur.id].mem=L;save();memSheet()});
+  $('memAdd').onclick=()=>{const v=$('memIn').value.trim();if(!v)return;if(L.length>=20)return toast('ความจำเต็มแล้ว ลบอันเก่าก่อน');L.push(v);chats[cur.id].mem=L;save();toast('📌 จำแล้ว');memSheet()}}
+async function profile(){const c=cur;
+  sheet(`<div class="prof"><div class="big">${picHTML(c)}</div><h4>${esc(c.name)} ${c.type==='world'?'🌍':''}</h4><div style="color:var(--a2);font-size:14px">${esc(c.tag||'')}</div>
+  ${c.owner_name?`<div style="margin-top:6px;font-size:13px;color:var(--mut)">สร้างโดย <a href="#" id="pfBy" style="color:var(--ink)">@${esc(c.owner_name)}</a>${c.official?' <span class="verified">✔</span>':''}</div>`:''}
+  <div style="color:var(--mut);font-size:13px;margin-top:4px">💬 ${fmt(c.chats)} ข้อความ · ❤️ <span id="pfL">${fmt(c.likes)}</span></div>
+  ${(c.cats||[]).length?`<div class="tags" style="justify-content:center;margin-top:10px">${c.cats.map(x=>`<span class="chip">${esc(x)}</span>`).join('')}</div>`:''}
+  <div class="row" style="justify-content:center;margin-top:12px">${B.on?`<button class="likebtn${c.liked?' on':''}" id="pfLike">${c.liked?'❤️ ถูกใจแล้ว':'🤍 ถูกใจ'}</button>`:''}</div>
+  <div class="ds">${esc(c.persona||'')}</div>${(c.cast||[]).length?`<div class="ds"><b>ตัวละครในจักรวาล</b>\n${c.cast.map(x=>'• '+x.name+' — '+x.desc).join('\n')}</div>`:''}</div>
+  ${c.mine?'<button class="opt" id="pfEd">✏️ แก้ไข</button><button class="opt red" id="pfDel">🗑️ ลบ</button>':''}
+  ${B.on&&!c.mine&&!c.official?'<button class="opt red" id="pfRep">🚩 รายงานเนื้อหาไม่เหมาะสม</button>':''}
+  <button class="opt" id="pX" style="text-align:center">ปิด</button>`);
+  $('pX').onclick=close;
+  if($('pfBy'))$('pfBy').onclick=e=>{e.preventDefault();close();if(B.on)openCreator(c.owner)};
+  if($('pfLike'))$('pfLike').onclick=async()=>{try{const j=await api('/api/chars/'+c.id+'/like',{method:'POST'});c.liked=j.liked;c.likes=j.likes;$('pfLike').className='likebtn'+(j.liked?' on':'');$('pfLike').textContent=j.liked?'❤️ ถูกใจแล้ว':'🤍 ถูกใจ';$('pfL').textContent=fmt(j.likes)}catch(e){toast(e.message)}};
+  if($('pfEd'))$('pfEd').onclick=()=>{close();openEditor(c)};
+  if($('pfDel'))$('pfDel').onclick=async()=>{const b=$('pfDel');if(!b.dataset.c){b.dataset.c=1;b.textContent='แตะอีกครั้งเพื่อยืนยันการลบ';return}
+    try{await delChar(c.id);close();stack.length=0;show('vHome');toast('ลบแล้ว')}catch(e){toast(e.message)}};
+  if($('pfRep'))$('pfRep').onclick=async()=>{try{await api('/api/chars/'+c.id+'/report',{method:'POST',body:{reason:'inappropriate'}});close();toast('ขอบคุณที่รายงาน เราจะตรวจสอบ')}catch(e){toast(e.message)}}}
 
 /* sheets */
 function sheet(html){$('sheet').innerHTML=html;$('mask').classList.add('on')}
 function close(){$('mask').classList.remove('on')}
 $('mask').onclick=e=>{if(e.target.id==='mask')close()};
 $('chMenu').onclick=()=>{sheet(`<h4>${esc(cur.name)}</h4>
+  <button class="opt" id="o5">👁️ ดูโปรไฟล์</button>
+  <button class="opt" id="o6">📌 ความจำ (${mem().length})</button>
   <button class="opt" id="o1">🔄 เริ่มเรื่องใหม่ (ล้างแชทนี้)</button>
-  ${cur.mine?'<button class="opt" id="o2">✏️ แก้ไขตัวละคร</button><button class="opt red" id="o3">🗑️ ลบตัวละคร</button>':''}
   <button class="opt" id="o4">ปิด</button>`);
-  $('o1').onclick=()=>{if(ctrl)ctrl.abort();delete chats[cur.id];S.set('lumi_chats',chats);close();openChat(cur.id)};
-  $('o4').onclick=close;
-  if(cur.mine){$('o2').onclick=()=>{close();openEditor(cur)};
-    $('o3').onclick=()=>{const b=$('o3');if(!b.dataset.c){b.dataset.c=1;b.textContent='แตะอีกครั้งเพื่อยืนยันการลบ';return}
-      mine=mine.filter(x=>x.id!==cur.id);delete chats[cur.id];S.set('lumi_chars',mine);S.set('lumi_chats',chats);close();show('vHome');toast('ลบแล้ว')}}};
-$('meBtn').onclick=()=>{const prov=cfg.provider||(hasClaude?'claude':'gemini');
-  sheet(`<h4>ตั้งค่า</h4>
-  <label>ชื่อที่ให้ตัวละครเรียกคุณ</label><input class="in" id="uN" maxlength="30" value="${esc(user.name)}" placeholder="เช่น เท็กซ์">
-  <label>เกี่ยวกับตัวคุณในเรื่อง <small>(ไม่บังคับ)</small></label><textarea class="in" id="uB" placeholder="นักเดินทางหนุ่มที่ความจำเสื่อม...">${esc(user.bio)}</textarea>
+  $('o1').onclick=()=>{const b=$('o1');if(!b.dataset.c){b.dataset.c=1;b.textContent='แตะอีกครั้งเพื่อยืนยัน (ความจำและความสัมพันธ์จะรีเซ็ต)';return}
+    if(ctrl)ctrl.abort();delete chats[cur.id];S.set('lumi_chats',chats);close();openChat(cur.id)};
+  $('o5').onclick=profile;$('o6').onclick=()=>memSheet();$('o4').onclick=close};
+function aiSheet(){const prov=cfg.provider||(hasClaude?'claude':'gemini');
+  sheet(`<h4>🤖 ตั้งค่า AI</h4>
   <label>สไตล์การเขียน</label><div class="seg" id="sSeg"><button data-s="novel">📖 แบบนิยาย</button><button data-s="chat">💬 แบบแชท *ท่าทาง*</button></div>
   <label>ผู้ให้บริการ AI</label><div class="seg" id="pSeg">${hasClaude?'<button data-p="claude">Claude</button>':''}<button data-p="gemini">Gemini</button><button data-p="openrouter">OpenRouter</button></div>
   <div id="pBox"></div>
@@ -581,10 +819,11 @@ $('meBtn').onclick=()=>{const prov=cfg.provider||(hasClaude?'claude':'gemini');
       bt.disabled=false;bt.textContent='โหลดรายชื่อ'}};
   const grab=()=>{if($('kIn'))keys[p]=$('kIn').value.trim();if($('mSel'))models[p]=$('mSel').value};
   box();
-  $('uS').onclick=()=>{grab();user={name:$('uN').value.trim(),bio:$('uB').value.trim()};
+  $('uS').onclick=()=>{grab();
     Object.assign(cfg,{style:sty,provider:p,tier,gKey:keys.gemini||'',oKey:keys.openrouter||'',gModel:models.gemini||'',oModel:models.openrouter||'openrouter/free'});
-    S.set('lumi_user',user);S.set('lumi_cfg',cfg);close();toast('บันทึกแล้ว · ใช้ '+PROV[p])}};
-renderCats();show('vHome');
+    S.set('lumi_cfg',cfg);checkAiBtn&&checkAiBtn();close();toast('บันทึกแล้ว · ใช้ '+PROV[p])}}
+
+boot().then(()=>show('vHome'));
 </script>
 </body>
 </html>
