@@ -18,3 +18,7 @@ services:
         fromDatabase:
           name: lumi-db
           property: connectionString
+      - key: OPENROUTER_KEY
+        sync: false
+      - key: OPENROUTER_MODEL
+        value: openrouter/free
