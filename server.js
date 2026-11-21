@@ -250,4 +250,7 @@ http.createServer(async (req, res) => {
   }
 }).listen(PORT, () => console.log('LUMI AI on :' + PORT));
 
-init().then(() => console.log('db ready')).catch(e => { console.error('init failed', e); process.exit(1); });
+(async function start(n = 0) {
+  try { await init(); console.log('db ready'); }
+  catch (e) { console.error('init failed (try ' + (n + 1) + ')', e.message); if (n >= 12) process.exit(1); setTimeout(() => start(n + 1), 5000); }
+})();
