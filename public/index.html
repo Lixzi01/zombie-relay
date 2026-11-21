@@ -73,10 +73,11 @@ textarea.in{resize:vertical;min-height:84px;line-height:1.55}
 .tags .chip{padding:6px 12px;font-size:13px}
 /* chat */
 #vChat{position:relative}
-.chatbg{position:absolute;inset:0;background-size:cover;background-position:center;filter:blur(24px) brightness(.32) saturate(1.2);transform:scale(1.15);z-index:0}
+.chatbg{position:absolute;inset:0;background-size:cover;background-position:center top;filter:blur(3px) brightness(.38);transform:scale(1.04);z-index:0}
+.chatbg::after{content:'';position:absolute;inset:0;background:linear-gradient(#0f0f1180,#0f0f11cc 70%,#0f0f11)}
 #vChat>*:not(.chatbg){position:relative;z-index:1}
 .chead{display:flex;align-items:center;gap:10px;padding:10px;border-bottom:1px solid #ffffff12;background:#0f0f11aa;backdrop-filter:blur(10px)}
-.chead .av{width:40px;height:40px;border-radius:50%;overflow:hidden;flex-shrink:0;background:var(--p2)}
+.chead .av{cursor:pointer;width:42px;height:42px;border:2px solid var(--a1);border-radius:50%;overflow:hidden;flex-shrink:0;background:var(--p2)}
 .chead .av img{width:100%;height:100%;object-fit:cover}.chead .av .ph{font-size:20px}
 .chead .nm{font-weight:700}.chead .tg{font-size:12px;color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #msgs{flex:1;overflow-y:auto;padding:16px 12px 10px}
@@ -87,10 +88,19 @@ textarea.in{resize:vertical;min-height:84px;line-height:1.55}
 .intro .sc{color:#cfc8c2;font-size:13.5px;font-style:italic;line-height:1.65;max-width:520px;margin:0 auto}
 .m{max-width:86%;line-height:1.75;font-size:15.5px;word-wrap:break-word}
 .m.user{align-self:flex-end;background:var(--grad);color:#fff;padding:9px 14px;border-radius:18px 18px 4px 18px;white-space:pre-wrap}
-.m.ai{align-self:flex-start;background:#1c1c21e6;border:1px solid #ffffff10;padding:10px 14px;border-radius:4px 18px 18px 18px}
+.aiwrap{align-self:stretch;display:flex;flex-direction:column;gap:6px;max-width:100%}
+.aihead{display:flex;align-items:center;gap:8px;cursor:pointer}
+.aihead .av{width:34px;height:34px;border-radius:50%;overflow:hidden;background:var(--p2);border:2px solid #ffffff22;flex-shrink:0}
+.aihead .av img{width:100%;height:100%;object-fit:cover}.aihead .av .ph{font-size:17px}
+.aihead b{font-size:14px}.aihead span{font-size:11px;color:var(--mut);background:#ffffff12;border-radius:6px;padding:1px 7px}
+.m.ai{max-width:100%;background:#1f1f25e8;backdrop-filter:blur(6px);border:1px solid #ffffff12;padding:12px 16px;border-radius:4px 18px 18px 18px;color:#dedbe4}
+.m.ai .say{border-left:3px solid var(--a2);padding:2px 0 2px 12px;color:#fff;margin:.6em 0}
+.prof{text-align:center}.prof .big{width:180px;aspect-ratio:3/4;margin:0 auto 12px;border-radius:16px;overflow:hidden;background:var(--p2)}
+.prof .big img{width:100%;height:100%;object-fit:cover}.prof .big .ph{font-size:70px}
+.prof .ds{color:var(--mut);font-size:14px;line-height:1.6;text-align:left;margin-top:12px;white-space:pre-wrap}
 .m.ai p{margin:.35em 0}.m.ai em{color:var(--act)}
 .m.err{align-self:center;color:#ff9b9b;font-size:13.5px;text-align:center}
-.who{font-size:12px;color:var(--a2);font-weight:600;margin-bottom:2px}
+
 .mtools{display:flex;gap:6px;margin-top:-6px}
 .mtools button{font-size:12.5px;color:var(--mut);padding:4px 10px;border-radius:999px;background:#ffffff0d}
 .typing{color:var(--mut);font-size:14px}
@@ -320,7 +330,7 @@ function errText(e){return e?.code==='rate_limited'?'โควต้าฟรี
 const all=()=>[...mine,...PRESETS];
 const byId=id=>all().find(c=>c.id===id);
 function esc(s){const d=document.createElement('div');d.textContent=s??'';return d.innerHTML}
-function md(t){return (t||'').trim().split(/\n\s*\n/).map(p=>'<p>'+esc(p).replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>').replace(/\*([^*\n]+)\*/g,'<em>$1</em>').replace(/\n/g,'<br>')+'</p>').join('')}
+function md(t){return (t||'').trim().split(/\n\s*\n/).map(p=>(/^["“«]/.test(p.trim())?'<p class="say">':'<p>')+esc(p).replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>').replace(/\*([^*\n]+)\*/g,'<em>$1</em>').replace(/\n/g,'<br>')+'</p>').join('')}
 function toast(t){const e=$('toast');e.textContent=t;e.classList.add('on');clearTimeout(e._t);e._t=setTimeout(()=>e.classList.remove('on'),2600)}
 function picHTML(c){ return c.img?`<img src="${c.img}" alt="">`:`<div class="ph" style="background:linear-gradient(160deg,hsl(${c.hue??20} 55% 32%),hsl(${(c.hue??20)+40} 50% 14%))">${esc(c.emoji||'🙂')}</div>`}
 function fmt(n){return n>=1000?(n/1000).toFixed(1)+'k':n}
@@ -440,15 +450,20 @@ function save(){chats[cur.id]={msgs:hist(),t:Date.now()};S.set('lumi_chats',chat
 function openChat(id){cur=byId(id);if(!cur)return show('vHome');
   if(!chats[id]||!chats[id].msgs.length)chats[id]={msgs:cur.greet?[{role:'assistant',content:cur.greet}]:[],t:Date.now()};
   $('chatBg').style.backgroundImage=cur.img?`url(${cur.img})`:`linear-gradient(160deg,hsl(${cur.hue} 55% 40%),hsl(${cur.hue+40} 50% 15%))`;
-  $('chAv').innerHTML=picHTML(cur);$('chNm').textContent=cur.name;$('chTg').textContent=cur.tag||'';
+  $('chAv').innerHTML=picHTML(cur);$('chAv').onclick=profile;$('chNm').textContent=cur.name;$('chTg').textContent=cur.tag||'';
   renderMsgs();show('vChat');updateBtn()}
 function renderMsgs(){const L=$('list');L.innerHTML='';
   const intro=document.createElement('div');intro.className='intro';
   intro.innerHTML=`<div class="big">${picHTML(cur)}</div>${cur.scene?`<div class="sc">${esc(cur.scene)}</div>`:''}`;L.appendChild(intro);
   hist().forEach(m=>{if(!m.hidden)bubble(m.role,m.content)});tools();bottom()}
-function bubble(role,text){const d=document.createElement('div');d.className='m '+role;
-  if(role==='assistant'){d.className='m ai';d.innerHTML=`<div class="who">${esc(cur.name)}</div><div class="bd">${md(text)}</div>`}else d.textContent=text;
-  $('list').appendChild(d);return d}
+function bubble(role,text){const d=document.createElement('div');
+  if(role==='assistant'){const w=document.createElement('div');w.className='aiwrap';
+    w.innerHTML=`<div class="aihead"><div class="av">${picHTML(cur)}</div><b>${esc(cur.name)}</b><span>ตัวละคร</span></div><div class="m ai"><div class="bd">${md(text)}</div></div>`;
+    w.querySelector('.aihead').onclick=profile;$('list').appendChild(w);return w}
+  d.className='m user';d.textContent=text;$('list').appendChild(d);return d}
+function profile(){sheet(`<div class="prof"><div class="big">${picHTML(cur)}</div><h4>${esc(cur.name)}</h4><div style="color:var(--a2);font-size:14px">${esc(cur.tag||'')}</div>
+  ${(cur.cats||[]).length?`<div class="tags" style="justify-content:center;margin-top:10px">${cur.cats.map(c=>`<span class="chip">${esc(c)}</span>`).join('')}</div>`:''}
+  <div class="ds">${esc(cur.persona||'')}</div></div><button class="opt" id="pX" style="text-align:center;margin-top:10px">ปิด</button>`);$('pX').onclick=close}
 function tools(){document.querySelectorAll('.mtools').forEach(x=>x.remove());const h=hist();
   if(busy||h.length<2||h[h.length-1].role!=='assistant')return;
   const t=document.createElement('div');t.className='mtools';
