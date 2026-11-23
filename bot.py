@@ -313,6 +313,33 @@ async def timeout(i: discord.Interaction, member: discord.Member, minutes: int,
     await i.response.send_message(f"🔇 ไทม์เอาต์ {member} {minutes} นาที · เหตุผล: {reason}")
 
 
+class EmbedModal(discord.ui.Modal, title="สร้างข้อความ Embed"):
+    e_title = discord.ui.TextInput(label="หัวข้อ", max_length=256, required=False)
+    e_desc = discord.ui.TextInput(label="เนื้อหา", style=discord.TextStyle.paragraph,
+                                  max_length=4000)
+    e_color = discord.ui.TextInput(label="สี (hex เช่น 5865F2)", max_length=6, required=False,
+                                   placeholder="เว้นว่างได้")
+    e_image = discord.ui.TextInput(label="ลิงก์รูป (ไม่บังคับ)", required=False)
+
+    async def on_submit(self, i: discord.Interaction):
+        try:
+            color = int(str(self.e_color.value or "5865F2").lstrip("#"), 16)
+        except ValueError:
+            color = COLOR
+        e = discord.Embed(title=str(self.e_title.value or "") or None,
+                          description=str(self.e_desc.value), color=color)
+        if self.e_image.value:
+            e.set_image(url=str(self.e_image.value))
+        await i.channel.send(embed=e)
+        await i.response.send_message("✅ ส่ง embed แล้ว", ephemeral=True)
+
+
+@tree.command(name="embed", description="สร้างข้อความ embed สวย ๆ (แอดมิน)")
+@app_commands.checks.has_permissions(manage_messages=True)
+async def embed(i: discord.Interaction):
+    await i.response.send_modal(EmbedModal())
+
+
 @tree.command(name="setwelcome", description="ตั้งห้องต้อนรับคนเข้าใหม่ (แอดมิน)")
 @app_commands.describe(channel="ห้องที่จะส่งข้อความต้อนรับ")
 @app_commands.checks.has_permissions(manage_guild=True)
@@ -354,18 +381,70 @@ async def testwelcome(i: discord.Interaction):
     await i.followup.send(file=discord.File(buf, "welcome.png"), ephemeral=True)
 
 
+HELP_CATS = {
+    "fun": ("🎮 สนุก", "คำสั่งเล่นสนุกในเซิร์ฟเวอร์", [
+        ("/roll", "ทอยลูกเต๋า เลือกจำนวนหน้าได้"),
+        ("/coinflip", "โยนเหรียญ หัวหรือก้อย"),
+        ("/8ball", "ถามลูกแก้ววิเศษ"),
+        ("/choose", "ให้บอทสุ่มเลือกให้"),
+    ]),
+    "info": ("ℹ️ ข้อมูล", "ดูข้อมูลคนและเซิร์ฟเวอร์", [
+        ("/ping", "เช็กบอทออนไลน์ + ดีเลย์"),
+        ("/userinfo", "ดูข้อมูลสมาชิก"),
+        ("/serverinfo", "ดูข้อมูลเซิร์ฟเวอร์"),
+        ("/avatar", "ดูรูปโปรไฟล์เต็ม"),
+    ]),
+    "event": ("🎉 กิจกรรม", "สร้างกิจกรรมมี UI กดปุ่มได้", [
+        ("/poll", "สร้างโพลโหวต"),
+        ("/giveaway", "สุ่มแจกรางวัลจับเวลา"),
+        ("/rolemenu", "ปุ่มกดรับยศ"),
+    ]),
+    "welcome": ("👋 ต้อนรับ", "การ์ดต้อนรับคนเข้าใหม่", [
+        ("/testwelcome", "ลองดูการ์ดของตัวเอง"),
+        ("/setwelcome", "ตั้งห้องต้อนรับ (แอดมิน)"),
+        ("/setwelcomebg", "เปลี่ยนรูปพื้นหลังการ์ด (แอดมิน)"),
+    ]),
+    "admin": ("🛡️ แอดมิน", "คำสั่งจัดการเซิร์ฟเวอร์", [
+        ("/clear", "ลบข้อความล่าสุด"),
+        ("/kick", "เตะสมาชิก"),
+        ("/ban", "แบนสมาชิก"),
+        ("/timeout", "สั่งปิดปากชั่วคราว"),
+        ("/embed", "สร้างข้อความ embed สวย ๆ"),
+    ]),
+}
+
+
+def _help_embed(cat_key):
+    name, desc, cmds = HELP_CATS[cat_key]
+    e = discord.Embed(title=f"{name}", description=desc, color=COLOR)
+    for cmd, d in cmds:
+        e.add_field(name=cmd, value=d, inline=False)
+    e.set_footer(text="เลือกหมวดอื่นจากเมนูด้านล่าง")
+    return e
+
+
+class HelpView(discord.ui.View):
+    def __init__(self):
+        super().__init__(timeout=120)
+        opts = [discord.SelectOption(label=v[0], description=v[1], value=k,
+                                     emoji=v[0].split()[0]) for k, v in HELP_CATS.items()]
+        self.sel = discord.ui.Select(placeholder="เลือกหมวดคำสั่ง...", options=opts)
+        self.sel.callback = self.on_select
+        self.add_item(self.sel)
+
+    async def on_select(self, i: discord.Interaction):
+        await i.response.edit_message(embed=_help_embed(self.sel.values[0]), view=self)
+
+
 @tree.command(name="help", description="ดูคำสั่งทั้งหมด")
 async def help_cmd(i: discord.Interaction):
-    e = discord.Embed(title="📖 คำสั่งของบอท", color=COLOR)
-    e.add_field(name="🎮 สนุก", value="`/roll` `/coinflip` `/8ball` `/choose`", inline=False)
-    e.add_field(name="ℹ️ ข้อมูล", value="`/ping` `/userinfo` `/serverinfo` `/avatar`",
-                inline=False)
-    e.add_field(name="🎉 กิจกรรม", value="`/poll` `/giveaway` `/rolemenu`", inline=False)
-    e.add_field(name="🛡️ แอดมิน",
-                value="`/clear` `/kick` `/ban` `/timeout` `/setwelcome` `/setwelcomebg`",
-                inline=False)
-    e.add_field(name="👋 ต้อนรับ", value="`/testwelcome` ลองดูการ์ดของตัวเอง", inline=False)
-    await i.response.send_message(embed=e, ephemeral=True)
+    e = discord.Embed(
+        title="📖 ศูนย์รวมคำสั่งของบอท",
+        description="เลือกหมวดจากเมนูด้านล่างเพื่อดูคำสั่งในหมวดนั้น\n\n"
+                    "🎮 สนุก · ℹ️ ข้อมูล · 🎉 กิจกรรม · 👋 ต้อนรับ · 🛡️ แอดมิน",
+        color=COLOR)
+    e.set_footer(text="บอทเซิร์ฟเวอร์เกม")
+    await i.response.send_message(embed=e, view=HelpView(), ephemeral=True)
 
 
 # ---------------- จัดการปุ่ม (ยศ + giveaway) ----------------
