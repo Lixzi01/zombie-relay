@@ -52,18 +52,38 @@ def _fit(draw, text, size, weight, max_w):
     return _font(size, weight)
 
 
-def render(username: str, member_count: int, avatar_bytes: bytes,
-           title="ยินดีต้อนรับ", subtitle_tmpl="สมาชิกคนที่ {n}") -> io.BytesIO:
-    img = _gradient((32, 34, 68), (14, 15, 30)).convert("RGBA")
-    d = ImageDraw.Draw(img)
+def _cover(bg_bytes):
+    """ครอบรูปพื้นหลังให้เต็ม 1000x350 แบบ cover"""
+    im = Image.open(io.BytesIO(bg_bytes)).convert("RGBA")
+    scale = max(W / im.width, H / im.height)
+    im = im.resize((int(im.width * scale) + 1, int(im.height * scale) + 1))
+    x = (im.width - W) // 2
+    y = (im.height - H) // 2
+    return im.crop((x, y, x + W, y + H))
 
-    # วงกลมตกแต่งจาง ๆ
-    glow = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-    gd = ImageDraw.Draw(glow)
-    gd.ellipse((-120, -160, 260, 220), fill=(88, 101, 242, 60))
-    gd.ellipse((760, 180, 1160, 520), fill=(235, 100, 190, 45))
-    glow = glow.filter(ImageFilter.GaussianBlur(70))
-    img = Image.alpha_composite(img, glow)
+
+def render(username: str, member_count: int, avatar_bytes: bytes,
+           title="ยินดีต้อนรับ", subtitle_tmpl="สมาชิกคนที่ {n}",
+           bg_bytes: bytes = None) -> io.BytesIO:
+    if bg_bytes:
+        try:
+            img = _cover(bg_bytes)
+            # เงาดำ: ชั้นมืดทั้งภาพ + ไล่เฉดเข้มด้านล่าง ให้ตัวอักษรอ่านออก
+            shade = Image.new("RGBA", (W, H), (8, 8, 18, 95))
+            sd = ImageDraw.Draw(shade)
+            for yy in range(H):
+                sd.line([(0, yy), (W, yy)], fill=(8, 8, 18, int(120 * (yy / H) ** 0.7)))
+            img = Image.alpha_composite(img, shade)
+        except Exception:
+            img = _gradient((32, 34, 68), (14, 15, 30)).convert("RGBA")
+    else:
+        img = _gradient((32, 34, 68), (14, 15, 30)).convert("RGBA")
+        glow = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+        gd = ImageDraw.Draw(glow)
+        gd.ellipse((-120, -160, 260, 220), fill=(88, 101, 242, 60))
+        gd.ellipse((760, 180, 1160, 520), fill=(235, 100, 190, 45))
+        glow = glow.filter(ImageFilter.GaussianBlur(70))
+        img = Image.alpha_composite(img, glow)
     d = ImageDraw.Draw(img)
 
     # กรอบมน
@@ -76,16 +96,20 @@ def render(username: str, member_count: int, avatar_bytes: bytes,
               outline=(88, 101, 242, 255), width=6)
     img.paste(_circle_avatar(avatar_bytes, av_size), (ax, ay), _circle_avatar(avatar_bytes, av_size))
 
-    # ข้อความ
+    # ข้อความ (มีเงาดำให้อ่านออกบนพื้นหลังสว่าง)
     tx = ax + av_size + 55
     max_w = W - tx - 50
-    d.text((tx, 95), title, font=_fit(d, title, 58, "Black", max_w),
-           fill=(255, 255, 255, 255))
+
+    def text_shadow(xy, text, font, fill):
+        x, y = xy
+        d.text((x + 2, y + 2), text, font=font, fill=(0, 0, 0, 160))
+        d.text((x, y), text, font=font, fill=fill)
+
+    text_shadow((tx, 95), title, _fit(d, title, 58, "Black", max_w), (255, 255, 255, 255))
     name_f = _fit(d, username, 44, "Bold", max_w)
-    d.text((tx, 165), username, font=name_f, fill=(190, 200, 255, 255))
+    text_shadow((tx, 165), username, name_f, (205, 212, 255, 255))
     sub = subtitle_tmpl.format(n=member_count)
-    d.text((tx, 228), sub, font=_fit(d, sub, 30, "Medium", max_w),
-           fill=(170, 175, 200, 255))
+    text_shadow((tx, 228), sub, _fit(d, sub, 30, "Medium", max_w), (225, 228, 240, 255))
 
     out = io.BytesIO()
     img.convert("RGB").save(out, "PNG")

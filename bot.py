@@ -61,6 +61,22 @@ def save_settings(s):
 settings = load_settings()
 
 
+BUNDLED_BG = os.path.join(os.path.dirname(__file__), "assets", "welcome_bg.png")
+RUNTIME_BG = "welcome_bg_runtime.png"
+
+
+def welcome_bg_bytes():
+    """คืนรูปพื้นหลังการ์ด: อันที่ตั้งผ่านคำสั่งก่อน แล้วค่อยอันที่ฝังมากับบอท"""
+    for p in (RUNTIME_BG, BUNDLED_BG):
+        try:
+            if os.path.exists(p):
+                with open(p, "rb") as f:
+                    return f.read()
+        except Exception:
+            pass
+    return None
+
+
 def welcome_channel_id(guild):
     gid = str(guild.id)
     if gid in settings.get("welcome", {}):
@@ -78,7 +94,8 @@ async def on_member_join(member: discord.Member):
     try:
         avatar = await member.display_avatar.read()
         buf = await asyncio.to_thread(
-            welcome_card.render, member.display_name, member.guild.member_count, avatar)
+            welcome_card.render, member.display_name, member.guild.member_count, avatar,
+            "ยินดีต้อนรับ", "สมาชิกคนที่ {n}", welcome_bg_bytes())
         file = discord.File(buf, filename="welcome.png")
         e = discord.Embed(
             description=f"{member.mention} ยินดีต้อนรับสู่ **{member.guild.name}** 🎉",
@@ -305,6 +322,38 @@ async def setwelcome(i: discord.Interaction, channel: discord.TextChannel):
     await i.response.send_message(f"✅ ตั้งห้องต้อนรับเป็น {channel.mention} แล้ว", ephemeral=True)
 
 
+@tree.command(name="setwelcomebg", description="ตั้งรูปพื้นหลังการ์ดต้อนรับ (แอดมิน)")
+@app_commands.describe(image="รูปพื้นหลัง (แนบไฟล์รูป)")
+@app_commands.checks.has_permissions(manage_guild=True)
+async def setwelcomebg(i: discord.Interaction, image: discord.Attachment):
+    if not (image.content_type or "").startswith("image/"):
+        return await i.response.send_message("กรุณาแนบไฟล์รูปภาพ", ephemeral=True)
+    await i.response.defer(ephemeral=True)
+    data = await image.read()
+    with open(RUNTIME_BG, "wb") as f:
+        f.write(data)
+    # ทำตัวอย่างให้ดู
+    try:
+        av = await i.user.display_avatar.read()
+        buf = await asyncio.to_thread(
+            welcome_card.render, i.user.display_name, i.guild.member_count,
+            av, "ยินดีต้อนรับ", "สมาชิกคนที่ {n}", data)
+        await i.followup.send("✅ ตั้งรูปพื้นหลังแล้ว นี่คือตัวอย่าง:",
+                              file=discord.File(buf, "preview.png"), ephemeral=True)
+    except Exception as e:
+        await i.followup.send(f"✅ ตั้งรูปแล้ว แต่ทำตัวอย่างไม่ได้: {e}", ephemeral=True)
+
+
+@tree.command(name="testwelcome", description="ลองดูการ์ดต้อนรับของตัวเอง")
+async def testwelcome(i: discord.Interaction):
+    await i.response.defer(ephemeral=True)
+    av = await i.user.display_avatar.read()
+    buf = await asyncio.to_thread(
+        welcome_card.render, i.user.display_name, i.guild.member_count,
+        av, "ยินดีต้อนรับ", "สมาชิกคนที่ {n}", welcome_bg_bytes())
+    await i.followup.send(file=discord.File(buf, "welcome.png"), ephemeral=True)
+
+
 @tree.command(name="help", description="ดูคำสั่งทั้งหมด")
 async def help_cmd(i: discord.Interaction):
     e = discord.Embed(title="📖 คำสั่งของบอท", color=COLOR)
@@ -313,7 +362,9 @@ async def help_cmd(i: discord.Interaction):
                 inline=False)
     e.add_field(name="🎉 กิจกรรม", value="`/poll` `/giveaway` `/rolemenu`", inline=False)
     e.add_field(name="🛡️ แอดมิน",
-                value="`/clear` `/kick` `/ban` `/timeout` `/setwelcome`", inline=False)
+                value="`/clear` `/kick` `/ban` `/timeout` `/setwelcome` `/setwelcomebg`",
+                inline=False)
+    e.add_field(name="👋 ต้อนรับ", value="`/testwelcome` ลองดูการ์ดของตัวเอง", inline=False)
     await i.response.send_message(embed=e, ephemeral=True)
 
 
