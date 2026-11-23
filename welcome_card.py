@@ -2,7 +2,7 @@
 import io
 import os
 
-from PIL import Image, ImageDraw, ImageFont, ImageFilter
+from PIL import Image, ImageDraw, ImageFont, ImageFilter, ImageSequence
 
 FONT_PATH = os.path.join(os.path.dirname(__file__), "assets", "NotoSansThai-VF.ttf")
 W, H = 1000, 350
@@ -52,14 +52,95 @@ def _fit(draw, text, size, weight, max_w):
     return _font(size, weight)
 
 
-def _cover(bg_bytes):
-    """ครอบรูปพื้นหลังให้เต็ม 1000x350 แบบ cover"""
-    im = Image.open(io.BytesIO(bg_bytes)).convert("RGBA")
+def _cover_img(im):
+    """ครอบรูป (PIL image) ให้เต็ม 1000x350 แบบ cover"""
+    im = im.convert("RGBA")
     scale = max(W / im.width, H / im.height)
     im = im.resize((int(im.width * scale) + 1, int(im.height * scale) + 1))
     x = (im.width - W) // 2
     y = (im.height - H) // 2
     return im.crop((x, y, x + W, y + H))
+
+
+def _cover(bg_bytes):
+    return _cover_img(Image.open(io.BytesIO(bg_bytes)))
+
+
+def _overlay(username, member_count, avatar_bytes, title, subtitle_tmpl):
+    """ชั้นทับ (เงา + กรอบ + อวตาร + ข้อความ) โปร่งใส ไว้วางบนพื้นหลัง"""
+    ov = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    d = ImageDraw.Draw(ov)
+    # เงาดำให้ตัวอักษรอ่านออก
+    d.rectangle((0, 0, W, H), fill=(8, 8, 18, 95))
+    for yy in range(H):
+        d.line([(0, yy), (W, yy)], fill=(8, 8, 18, int(120 * (yy / H) ** 0.7)))
+    d.rounded_rectangle((12, 12, W - 12, H - 12), radius=28,
+                        outline=(255, 255, 255, 50), width=2)
+    # อวตาร
+    av_size = 190
+    ax, ay = 70, (H - av_size) // 2
+    d.ellipse((ax - 6, ay - 6, ax + av_size + 6, ay + av_size + 6),
+              outline=(88, 101, 242, 255), width=6)
+    av = _circle_avatar(avatar_bytes, av_size)
+    ov.paste(av, (ax, ay), av)
+    # ข้อความ + เงา
+    tx = ax + av_size + 55
+    max_w = W - tx - 50
+
+    def ts(xy, text, font, fill):
+        x, y = xy
+        d.text((x + 2, y + 2), text, font=font, fill=(0, 0, 0, 170))
+        d.text((x, y), text, font=font, fill=fill)
+
+    ts((tx, 95), title, _fit(d, title, 58, "Black", max_w), (255, 255, 255, 255))
+    ts((tx, 165), username, _fit(d, username, 44, "Bold", max_w), (205, 212, 255, 255))
+    sub = subtitle_tmpl.format(n=member_count)
+    ts((tx, 228), sub, _fit(d, sub, 30, "Medium", max_w), (225, 228, 240, 255))
+    return ov
+
+
+def is_animated(bg_bytes):
+    try:
+        im = Image.open(io.BytesIO(bg_bytes))
+        return getattr(im, "is_animated", False) and getattr(im, "n_frames", 1) > 1
+    except Exception:
+        return False
+
+
+def render_animated(username, member_count, avatar_bytes, bg_bytes,
+                    title="ยินดีต้อนรับ", subtitle_tmpl="สมาชิกคนที่ {n}",
+                    max_frames=40) -> io.BytesIO:
+    """สร้างการ์ด GIF เคลื่อนไหวจากพื้นหลัง GIF/animated webp"""
+    src = Image.open(io.BytesIO(bg_bytes))
+    total = getattr(src, "n_frames", 1)
+    step = max(1, total // max_frames)
+    overlay = _overlay(username, member_count, avatar_bytes, title, subtitle_tmpl)
+    frames, durations = [], []
+    for idx, frame in enumerate(ImageSequence.Iterator(src)):
+        if idx % step:
+            continue
+        base = _cover_img(frame)
+        comp = Image.alpha_composite(base, overlay).convert("RGB")
+        frames.append(comp.convert("P", palette=Image.ADAPTIVE, colors=256))
+        durations.append(max(40, frame.info.get("duration", 80)) * step)
+    out = io.BytesIO()
+    frames[0].save(out, "GIF", save_all=True, append_images=frames[1:],
+                   duration=durations, loop=0, disposal=2, optimize=True)
+    out.seek(0)
+    return out
+
+
+def make_card(username, member_count, avatar_bytes, bg_bytes=None,
+              title="ยินดีต้อนรับ", subtitle_tmpl="สมาชิกคนที่ {n}"):
+    """คืน (ไฟล์, ชื่อไฟล์) — เป็น GIF ถ้าพื้นหลังเคลื่อนไหว ไม่งั้นเป็น PNG"""
+    if bg_bytes and is_animated(bg_bytes):
+        try:
+            return render_animated(username, member_count, avatar_bytes, bg_bytes,
+                                   title, subtitle_tmpl), "welcome.gif"
+        except Exception:
+            pass
+    return render(username, member_count, avatar_bytes, title, subtitle_tmpl,
+                  bg_bytes), "welcome.png"
 
 
 def render(username: str, member_count: int, avatar_bytes: bytes,

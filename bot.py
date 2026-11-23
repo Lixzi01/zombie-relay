@@ -93,14 +93,14 @@ async def on_member_join(member: discord.Member):
         return
     try:
         avatar = await member.display_avatar.read()
-        buf = await asyncio.to_thread(
-            welcome_card.render, member.display_name, member.guild.member_count, avatar,
-            "ยินดีต้อนรับ", "สมาชิกคนที่ {n}", welcome_bg_bytes())
-        file = discord.File(buf, filename="welcome.png")
+        buf, fname = await asyncio.to_thread(
+            welcome_card.make_card, member.display_name, member.guild.member_count,
+            avatar, welcome_bg_bytes())
+        file = discord.File(buf, filename=fname)
         e = discord.Embed(
             description=f"{member.mention} ยินดีต้อนรับสู่ **{member.guild.name}** 🎉",
             color=COLOR)
-        e.set_image(url="attachment://welcome.png")
+        e.set_image(url=f"attachment://{fname}")
         await ch.send(content=member.mention, embed=e, file=file)
     except discord.Forbidden:
         log.warning("ส่งข้อความต้อนรับไม่ได้ (บอทไม่มีสิทธิ์)")
@@ -362,11 +362,11 @@ async def setwelcomebg(i: discord.Interaction, image: discord.Attachment):
     # ทำตัวอย่างให้ดู
     try:
         av = await i.user.display_avatar.read()
-        buf = await asyncio.to_thread(
-            welcome_card.render, i.user.display_name, i.guild.member_count,
-            av, "ยินดีต้อนรับ", "สมาชิกคนที่ {n}", data)
-        await i.followup.send("✅ ตั้งรูปพื้นหลังแล้ว นี่คือตัวอย่าง:",
-                              file=discord.File(buf, "preview.png"), ephemeral=True)
+        buf, fname = await asyncio.to_thread(
+            welcome_card.make_card, i.user.display_name, i.guild.member_count, av, data)
+        note = " (เป็น GIF เคลื่อนไหว)" if fname.endswith(".gif") else ""
+        await i.followup.send(f"✅ ตั้งรูปพื้นหลังแล้ว{note} นี่คือตัวอย่าง:",
+                              file=discord.File(buf, fname), ephemeral=True)
     except Exception as e:
         await i.followup.send(f"✅ ตั้งรูปแล้ว แต่ทำตัวอย่างไม่ได้: {e}", ephemeral=True)
 
@@ -375,10 +375,10 @@ async def setwelcomebg(i: discord.Interaction, image: discord.Attachment):
 async def testwelcome(i: discord.Interaction):
     await i.response.defer(ephemeral=True)
     av = await i.user.display_avatar.read()
-    buf = await asyncio.to_thread(
-        welcome_card.render, i.user.display_name, i.guild.member_count,
-        av, "ยินดีต้อนรับ", "สมาชิกคนที่ {n}", welcome_bg_bytes())
-    await i.followup.send(file=discord.File(buf, "welcome.png"), ephemeral=True)
+    buf, fname = await asyncio.to_thread(
+        welcome_card.make_card, i.user.display_name, i.guild.member_count,
+        av, welcome_bg_bytes())
+    await i.followup.send(file=discord.File(buf, fname), ephemeral=True)
 
 
 HELP_CATS = {
@@ -500,9 +500,33 @@ async def on_error(i: discord.Interaction, error: app_commands.AppCommandError):
         await i.response.send_message(msg, ephemeral=True)
 
 
+async def sync_guild(guild):
+    """sync คำสั่งเข้าเซิร์ฟเวอร์ตรง ๆ ให้ขึ้นทันที (ไม่ต้องรอ global)"""
+    tree.copy_global_to(guild=guild)
+    synced = await tree.sync(guild=guild)
+    log.info("sync %d คำสั่งเข้า %s", len(synced), guild.name)
+
+
+@client.event
+async def on_guild_join(guild):
+    try:
+        await sync_guild(guild)
+    except Exception as e:
+        log.warning("sync ตอนเข้าเซิร์ฟใหม่ไม่ได้: %s", e)
+
+
 @client.event
 async def on_ready():
-    await tree.sync()
+    for g in client.guilds:
+        try:
+            await sync_guild(g)
+        except Exception as e:
+            log.warning("sync %s ไม่ได้: %s", g.name, e)
+    # ลบคำสั่ง global เก่าบน Discord กันขึ้นซ้ำ (ไม่แตะ tree ในหน่วยความจำ)
+    try:
+        await client.http.bulk_upsert_global_commands(client.application_id, [])
+    except Exception as e:
+        log.warning("ล้าง global ไม่ได้: %s", e)
     await client.change_presence(activity=discord.Game(name="/help | เซิร์ฟเวอร์เกม"))
     log.info("บอทออนไลน์แล้ว: %s (อยู่ %d เซิร์ฟเวอร์)", client.user, len(client.guilds))
 
